@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+.bg-olive {
+  background-color: #f0fde2;
+}
+.bg-green {
+  background-color: #627e3f;
+}
+.bg-dark-green {
+  background-color: #033621;
+}
+
+.text-olive {
+  color: #f0fde2;
+}
+.text-green {
+  color: #627e3f;
+}
+.text-dark-green {
+  color: #033621;
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-scroll {
+  animation: scroll 20s linear infinite;
+  display: inline-block;
+}
+
+body::selection{
+background-color: #033621;
+color: white;
+}
