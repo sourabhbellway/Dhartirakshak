@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 .bg-olive {
-  background-color: #f0fde2;
+  background-color: #f5faf0;
 }
 .bg-green {
   background-color: #627e3f;
@@ -11,7 +11,7 @@
 }
 
 .text-olive {
-  color: #f0fde2;
+  color: #f5faf0;
 }
 .text-green {
   color: #627e3f;

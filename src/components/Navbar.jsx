@@ -1,14 +1,55 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import logo from "../assets/DR-Logo.png";
 import { HiOutlineMenuAlt3 } from "react-icons/hi";
 import { RiCloseLargeLine } from "react-icons/ri";
 import { FiSearch } from "react-icons/fi";
 import { IoArrowForward } from "react-icons/io5";
+import { FaUserCircle } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom'
+import AuthModal from './AuthModal.jsx'
+import { useUserAuth } from '../contexts/UserAuthContext.jsx'
+import { toast } from 'react-toastify'
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [authToken, setAuthToken] = useState(null)
+  const [showAuth, setShowAuth] = useState(false)
+  const [defaultTab, setDefaultTab] = useState('signin')
+  const location = useLocation()
+  const navigate = useNavigate()
+  const { logout } = useUserAuth()
+  const [isProfileOpen, setIsProfileOpen] = useState(false)
+  const profileMenuRef = React.useRef(null)
+
+  useEffect(() => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('user_token') : null
+    const adminToken = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null
+    // Debug: which token exists
+    console.log('[Navbar] user_token:', token, '| admin_token:', adminToken)
+    setAuthToken(token)
+
+    const handleStorage = () => {
+      const updatedUserToken = localStorage.getItem('user_token')
+      const updatedAdminToken = localStorage.getItem('admin_token')
+      console.log('[Navbar][storage] user_token:', updatedUserToken, '| admin_token:', updatedAdminToken)
+      setAuthToken(updatedUserToken)
+    }
+    window.addEventListener('storage', handleStorage)
+    return () => window.removeEventListener('storage', handleStorage)
+  }, [])
+
+  // Open modal if redirected with state from protected route
+  useEffect(() => {
+    const state = location.state
+    if (state && state.openAuth) {
+      setDefaultTab(state.tab === 'signup' ? 'signup' : 'signin')
+      setShowAuth(true)
+      // Clear state so back/forward doesn't keep reopening
+      navigate(location.pathname, { replace: true })
+    }
+  }, [location, navigate])
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen)
@@ -20,9 +61,27 @@ const Navbar = () => {
     console.log('Searching for:', searchQuery)
   }
 
+  const handleLogout = () => {
+    logout()
+    setIsProfileOpen(false)
+    toast.success('Logged out')
+  }
+
+  useEffect(() => {
+    const onClickOutside = (e) => {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(e.target)) {
+        setIsProfileOpen(false)
+      }
+    }
+    if (isProfileOpen) {
+      document.addEventListener('mousedown', onClickOutside)
+    }
+    return () => document.removeEventListener('mousedown', onClickOutside)
+  }, [isProfileOpen])
+
   return (
-    <nav className="fixed top-8 w-full bg-white/0  ">
-      <div className=" mx-auto px-4 sm:px-6 lg:px-8">
+    <nav className="fixed top-8 w-full bg-white z-40 ">
+      <div className=" max-w-7xl mx-auto px-4 sm:px-6 lg:px-0">
         <div className="flex justify-between items-center h-16">
           {/* Logo Section */}
           <Link className="flex-shrink-0 flex items-center">
@@ -67,6 +126,40 @@ const Navbar = () => {
             <Link href="#" className="text-gray-700 hover:text-emerald-950 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
               E-Paper
             </Link>
+            {authToken ? (
+              <div className="relative" ref={profileMenuRef}>
+                <button
+                  onClick={() => setIsProfileOpen(v => !v)}
+                  className="flex items-center text-gray-700 hover:text-emerald-950 px-3 py-2 rounded-md transition-colors duration-200"
+                >
+                  <FaUserCircle size={26} />
+                </button>
+                {/* Dropdown */}
+                <div
+                  className={`absolute right-0 mt-2 w-44 origin-top-right rounded-xl border border-gray-100 bg-white shadow-lg transition-all duration-200 ${isProfileOpen ? 'opacity-100 scale-100 translate-y-0 pointer-events-auto' : 'opacity-0 scale-95 -translate-y-1 pointer-events-none'}`}
+                >
+                  <Link
+                    to="/profile"
+                    onClick={() => setIsProfileOpen(false)}
+                    className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 rounded-t-xl"
+                  >
+                    Profile
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 rounded-b-xl"
+                  >
+                    Logout
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center space-x-4">
+                <button onClick={() => { setDefaultTab('signin'); setShowAuth(true) }} className="text-olive bg-dark-green px-3 py-1 rounded-md text-sm font-medium transition-colors duration-200">
+                  Sign In
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -122,9 +215,29 @@ const Navbar = () => {
               <a href="#" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-gray-100 transition-colors duration-200">
                 E-Paper
               </a>
+              {authToken ? (
+                <div className="px-2 pt-2">
+                  <Link onClick={() => setIsMenuOpen(false)} to="/profile" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-gray-100 transition-colors duration-200">
+                    Profile
+                  </Link>
+                  <button onClick={() => { setIsMenuOpen(false); handleLogout() }} className="mt-1 block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-gray-100 transition-colors duration-200">
+                    Logout
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-3 px-2 pt-2">
+                  <button onClick={() => { setDefaultTab('signin'); setShowAuth(true); setIsMenuOpen(false) }} className="flex-1 text-center px-3 py-2 rounded-md text-base font-medium text-emerald-700 border border-emerald-600 hover:bg-emerald-50 transition-colors duration-200">
+                    Sign In
+                  </button>
+                  <button onClick={() => { setDefaultTab('signup'); setShowAuth(true); setIsMenuOpen(false) }} className="flex-1 text-center px-3 py-2 rounded-md text-base font-medium text-white bg-emerald-600 hover:bg-emerald-700 transition-colors duration-200">
+                    Sign Up
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         )}
+        <AuthModal isOpen={showAuth} onClose={() => setShowAuth(false)} defaultTab={defaultTab} />
       </div>
     </nav>
   )

@@ -3,6 +3,7 @@ import Welcome from "../components/Welcome";
 import Headline from "../components/Headline";
 import Background from "../components/Background";
 import Navbar from "../components/Navbar";
+import Banner from "../components/Banner";
 
 const Home = () => {
   const [showWelcome, setShowWelcome] = useState(true);
@@ -33,7 +34,7 @@ const Home = () => {
       <Background />
       <Headline headline={headlines} />
       <Navbar />
-  
+      <Banner />
     </div>
   );
 };
