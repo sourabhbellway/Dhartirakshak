@@ -7,6 +7,7 @@ const navItems = [
   { to: '/admin/banners', label: 'Banners', icon: <FiLayers /> },
   { to: '/admin/news', label: 'News', icon: <FiFileText /> },
   { to: '/admin/advertisements', label: 'Advertisements', icon: <FiFileText /> },
+  { to: '/admin/business-settings', label: 'Business Settings', icon: <FiLayers /> },
   { to: '/admin/blogs', label: 'Blogs', icon: <FiFileText /> },
   { to: '/admin/research', label: 'Research', icon: <FiBookOpen /> },
   { to: '/admin/posts', label: 'Posts', icon: <FiLayers /> },

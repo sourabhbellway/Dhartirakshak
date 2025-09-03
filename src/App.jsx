@@ -10,6 +10,10 @@ import { useUserAuth } from "./contexts/UserAuthContext.jsx";
 import Banners from "./admin/pages/Banners.jsx";
 import News from "./admin/pages/News.jsx";
 import Advertisements from "./admin/pages/Advertisements.jsx";
+import BusinessSettings from "./admin/pages/BusinessSettings.jsx";
+import MainLayout from "./layout/MainLayout.jsx";
+import Blogs from "./pages/Blogs.jsx";
+import Schemes from "./pages/Schemes.jsx";
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated } = useAuth();
@@ -27,7 +31,20 @@ const App = () => {
   return (
     <>
       <Routes>
-        <Route path="/" element={<Home />} />
+        {/* Public site wrapped in MainLayout */}
+        <Route element={<MainLayout /> }>
+          <Route path="/" element={<Home />} />
+          <Route path="/blogs" element={<Blogs />} />
+          <Route path="/schemes" element={<Schemes />} />
+          <Route
+            path="/profile"
+            element={
+              <UserPrivateRoute>
+                <Profile />
+              </UserPrivateRoute>
+            }
+          />
+        </Route>
 
         {/* Admin */}
         <Route path="/admin-login" element={<Login />} />
@@ -43,17 +60,8 @@ const App = () => {
           <Route path="banners" element={<Banners />} />
           <Route path="news" element={<News />} />
           <Route path="advertisements" element={<Advertisements />} />
+          <Route path="business-settings" element={<BusinessSettings />} />
         </Route>
-
-        {/* User Auth via Modal (routes removed) */}
-        <Route
-          path="/profile"
-          element={
-            <UserPrivateRoute>
-              <Profile />
-            </UserPrivateRoute>
-          }
-        />
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

@@ -15,6 +15,8 @@ const Banner = () => {
       try {
         const res = await axios.get(`${BASE_URL}/api/banners`);
         const items = Array.isArray(res?.data?.data) ? res.data.data : [];
+        
+        
         setBanners(items);
         setActiveIndex(0);
       } catch (err) {
@@ -48,7 +50,7 @@ const Banner = () => {
 
   return (
     <div
-      className="relative w-full overflow-hidden  top-24 z-10 "
+      className="relative w-full overflow-hidden z-10"
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
@@ -62,7 +64,7 @@ const Banner = () => {
               <img
                 src={item.image}
                 alt={item.title || 'banner'}
-                className="w-full h-[200px] sm:h-[220px] md:h-[280px] lg:h-[300px] object-cover"
+                className="w-full h-[200px] sm:h-[120px] md:h-[160px] lg:h-[200px] object-cover"
                 loading="lazy"
               />
             </div>

@@ -3,6 +3,8 @@ import DataTable from '../components/DataTable.jsx'
 import adminAds from '../controllers/adminAdvertisementController.js'
 import { useAuth } from '../../contexts/AuthContext.jsx'
 import { toast } from 'react-toastify'
+import categoryCtrl from '../controllers/categoryController.js'
+import FileDropzone from '../components/FileDropzone.jsx'
 
 const fullImageUrl = (path) => {
   if (!path) return null
@@ -18,8 +20,11 @@ const Advertisements = () => {
   const [previewSrc, setPreviewSrc] = useState(null)
   const [openCreate, setOpenCreate] = useState(false)
   const [openUpdateImage, setOpenUpdateImage] = useState(null) // id or null
-  const [createValues, setCreateValues] = useState({ title: '', description: '', company: '', image: null, is_active: 1 })
+  const [createValues, setCreateValues] = useState({ title: '', description: '', company: '', image: null, is_active: 1, category_id: '' })
   const [updateFile, setUpdateFile] = useState(null)
+  const [categories, setCategories] = useState([])
+  const [openNewCategory, setOpenNewCategory] = useState(false)
+  const [newCategory, setNewCategory] = useState('')
 
   const fetchData = async () => {
     setLoading(true); setError('')
@@ -34,7 +39,18 @@ const Advertisements = () => {
     }
   }
 
-  useEffect(() => { fetchData() }, [])
+  const fetchCategories = async () => {
+    try {
+      const res = await categoryCtrl.list(token)
+      const data = res?.data || res || []
+      setCategories(Array.isArray(data) ? data : [])
+    } catch (e) {
+      console.error(e)
+      toast.error('Failed to load categories')
+    }
+  }
+
+  useEffect(() => { fetchData(); fetchCategories(); }, [])
 
   const columns = [
     { key: 'id', title: 'ID' },
@@ -68,7 +84,7 @@ const Advertisements = () => {
   const handleActivate = async (id) => {
     try {
       await adminAds.activate(token, id)
-      toast.success('Activated')
+    toast.success('Activated')
       fetchData()
     } catch (e) {
       toast.error('Activate failed')
@@ -86,25 +102,21 @@ const Advertisements = () => {
   }
 
   const handleCreateChange = (e) => {
-    const { name, value, files } = e.target
-    if (files) {
-      setCreateValues(v => ({ ...v, [name]: files[0] }))
-    } else {
-      setCreateValues(v => ({ ...v, [name]: value }))
-    }
+    const { name, value } = e.target
+    setCreateValues(v => ({ ...v, [name]: value }))
   }
 
   const handleCreateSubmit = async (e) => {
     e.preventDefault()
     if (!createValues.title || !createValues.image || !createValues.company) {
-      toast.error('Title, Company, and Image are required')
+      toast.error('Title, Company and Image are required')
       return
     }
     try {
       await adminAds.create(token, createValues)
       toast.success('Advertisement created')
       setOpenCreate(false)
-      setCreateValues({ title: '', description: '', company: '', image: null, is_active: 1 })
+      setCreateValues({ title: '', description: '', company: '', image: null, is_active: 1, category_id: '' })
       fetchData()
     } catch (e) {
       toast.error('Create failed')
@@ -125,11 +137,28 @@ const Advertisements = () => {
     }
   }
 
+  const handleNewCategorySubmit = async (e) => {
+    e.preventDefault()
+    if (!newCategory.trim()) return
+    try {
+      await categoryCtrl.create(token, newCategory.trim())
+      toast.success('Category created')
+      setOpenNewCategory(false)
+      setNewCategory('')
+      fetchCategories()
+    } catch (e) {
+      toast.error('Create category failed')
+    }
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-dark-green text-xl font-semibold">Advertisements</h2>
-        <button onClick={() => setOpenCreate(true)} className="px-4 py-2 rounded-full bg-emerald-700 hover:bg-emerald-800 text-white text-sm">Create Advertisement</button>
+        <div className="flex items-center gap-2">
+          <button onClick={() => setOpenNewCategory(true)} className="px-4 py-2 rounded-full bg-amber-600 hover:bg-amber-700 text-white text-sm">New Category</button>
+          <button onClick={() => setOpenCreate(true)} className="px-4 py-2 rounded-full bg-emerald-700 hover:bg-emerald-800 text-white text-sm">Create Advertisement</button>
+        </div>
       </div>
 
       {error && <div className="text-red-700 bg-red-50 border border-red-200 p-3 rounded">{error}</div>}
@@ -167,7 +196,15 @@ const Advertisements = () => {
               <input className="w-full border border-emerald-200 rounded-lg p-2 text-sm" name="title" placeholder="Title" value={createValues.title} onChange={handleCreateChange} required />
               <input className="w-full border border-emerald-200 rounded-lg p-2 text-sm" name="company" placeholder="Company" value={createValues.company} onChange={handleCreateChange} required />
               <textarea className="w-full border border-emerald-200 rounded-lg p-2 text-sm" name="description" placeholder="Description" value={createValues.description} onChange={handleCreateChange} />
-              <input className="w-full border border-emerald-200 rounded-lg p-2 text-sm" name="image" type="file" accept="image/*" onChange={handleCreateChange} required />
+              {/* Category Dropdown (saves category_id) */}
+              <select name="category_id" value={createValues.category_id} onChange={handleCreateChange} className="w-full border border-emerald-200 rounded-lg p-2 text-sm">
+                <option value="" disabled>Select Category</option>
+                {categories.map((cat) => (
+                  <option key={cat.id || cat._id} value={cat.id || cat._id}>{cat.category || cat.name || cat.title}</option>
+                ))}
+              </select>
+              {/* Image Dropzone */}
+              <FileDropzone label="Image" accept="image/*" value={createValues.image} onChange={(file) => setCreateValues(v => ({ ...v, image: file }))} required heightClass="h-44" />
               <div className="flex items-center justify-end gap-2 pt-2">
                 <button type="button" onClick={() => setOpenCreate(false)} className="px-4 py-2 rounded-full bg-emerald-100 text-emerald-900">Cancel</button>
                 <button type="submit" className="px-4 py-2 rounded-full bg-emerald-700 text-white">Create</button>
@@ -182,10 +219,25 @@ const Advertisements = () => {
           <div className="bg-white rounded-2xl p-5 max-w-md w-[92%]" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-dark-green text-lg font-semibold mb-3">Update Image</h3>
             <form onSubmit={handleUpdateImage} className="space-y-3">
-              <input className="w-full border border-emerald-200 rounded-lg p-2 text-sm" type="file" accept="image/*" onChange={(e) => setUpdateFile(e.target.files?.[0] || null)} required />
+              <FileDropzone label="New Image" accept="image/*" value={updateFile} onChange={(file) => setUpdateFile(file)} required heightClass="h-40" />
               <div className="flex items-center justify-end gap-2 pt-2">
                 <button type="button" onClick={() => setOpenUpdateImage(null)} className="px-4 py-2 rounded-full bg-emerald-100 text-emerald-900">Cancel</button>
                 <button type="submit" className="px-4 py-2 rounded-full bg-sky-600 text-white">Update</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {openNewCategory && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center" onClick={() => setOpenNewCategory(false)}>
+          <div className="bg-white rounded-2xl p-5 max-w-sm w-[92%]" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-dark-green text-lg font-semibold mb-3">New Category</h3>
+            <form onSubmit={handleNewCategorySubmit} className="space-y-3">
+              <input className="w-full border border-emerald-200 rounded-lg p-2 text-sm" placeholder="Category (e.g., Research)" value={newCategory} onChange={(e) => setNewCategory(e.target.value)} required />
+              <div className="flex items-center justify-end gap-2 pt-2">
+                <button type="button" onClick={() => setOpenNewCategory(false)} className="px-4 py-2 rounded-full bg-emerald-100 text-emerald-900">Cancel</button>
+                <button type="submit" className="px-4 py-2 rounded-full bg-amber-600 text-white">Create Category</button>
               </div>
             </form>
           </div>

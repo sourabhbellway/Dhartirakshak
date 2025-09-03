@@ -8,7 +8,7 @@ const Welcome = ({ onComplete }) => {
     const timer = setTimeout(() => {
       setIsVisible(false)
       onComplete()
-    }, 3000)
+    }, 500)
 
     const progressTimer = setInterval(() => {
       setProgress(prev => {

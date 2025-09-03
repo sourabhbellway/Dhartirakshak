@@ -10,6 +10,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import AuthModal from './AuthModal.jsx'
 import { useUserAuth } from '../contexts/UserAuthContext.jsx'
 import { toast } from 'react-toastify'
+import categoryPublicController from '../controllers/categoryPublicController.js'
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -17,28 +18,40 @@ const Navbar = () => {
   const [authToken, setAuthToken] = useState(null)
   const [showAuth, setShowAuth] = useState(false)
   const [defaultTab, setDefaultTab] = useState('signin')
+  const [isScrolled, setIsScrolled] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
   const { logout } = useUserAuth()
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const profileMenuRef = React.useRef(null)
+  const [categories, setCategories] = useState([])
+  const [catError, setCatError] = useState('')
 
   useEffect(() => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('user_token') : null
     const adminToken = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null
-    // Debug: which token exists
-    console.log('[Navbar] user_token:', token, '| admin_token:', adminToken)
     setAuthToken(token)
 
     const handleStorage = () => {
       const updatedUserToken = localStorage.getItem('user_token')
       const updatedAdminToken = localStorage.getItem('admin_token')
-      console.log('[Navbar][storage] user_token:', updatedUserToken, '| admin_token:', updatedAdminToken)
       setAuthToken(updatedUserToken)
     }
     window.addEventListener('storage', handleStorage)
     return () => window.removeEventListener('storage', handleStorage)
   }, [])
+
+  // Handle scroll event to make navbar fixed
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      // Make navbar fixed when scrolling down
+      setIsScrolled(scrollTop > 100);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Open modal if redirected with state from protected route
   useEffect(() => {
@@ -51,14 +64,30 @@ const Navbar = () => {
     }
   }, [location, navigate])
 
+  // Load categories for navigation links
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await categoryPublicController.list()
+        const data = res?.data || res || []
+        setCategories(Array.isArray(data) ? data : [])
+      } catch (e) {
+        setCatError('')
+      }
+    }
+    load()
+  }, [])
+
+  const getCategoryName = (c) => c?.category || c?.name || c?.title || ''
+  const normalize = (s) => (s || '').toString().trim().replace(/^\/+|\/+$/g, '').toLowerCase()
+
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen)
   }
 
   const handleSearch = (e) => {
     e.preventDefault()
-    // Handle search functionality here
-    console.log('Searching for:', searchQuery)
+    // Implement search here
   }
 
   const handleLogout = () => {
@@ -80,11 +109,11 @@ const Navbar = () => {
   }, [isProfileOpen])
 
   return (
-    <nav className="fixed top-8 w-full bg-white z-40 ">
-      <div className=" max-w-7xl mx-auto px-4 sm:px-6 lg:px-0">
+    <nav className={`${isScrolled ? 'fixed top-0' : 'relative'} w-full bg-white z-40 transition-all duration-300`}>
+      <div className=" mx-auto px-4 sm:px-6 lg:px-10">
         <div className="flex justify-between items-center h-16">
           {/* Logo Section */}
-          <Link className="flex-shrink-0 flex items-center">
+          <Link className="flex-shrink-0 flex items-center" to={'/'}>
            <img src={logo} alt='logo'  className='w-20'/>
           </Link>
 
@@ -114,18 +143,16 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link href="#" className="text-gray-700 hover:text-emerald-950 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-              Blogs
-            </Link>
-            <Link href="#" className="text-gray-700 hover:text-emerald-950 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-              Research
-            </Link>
-            <Link href="#" className="text-gray-700 hover:text-emerald-950 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-              Schemes
-            </Link>
-            <Link href="#" className="text-gray-700 hover:text-emerald-950 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-              E-Paper
-            </Link>
+            {categories.map((cat, idx) => {
+              const name = getCategoryName(cat)
+              const routeName = normalize(name)
+              if (!routeName) return null
+              return (
+                <Link key={cat.id || cat._id || name + idx} to={`/${routeName}`} className="text-gray-700 hover:text-emerald-950 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 capitalize">
+                  {name}
+                </Link>
+              )
+            })}
             {authToken ? (
               <div className="relative" ref={profileMenuRef}>
                 <button
@@ -203,18 +230,16 @@ const Navbar = () => {
         {isMenuOpen && (
           <div className="md:hidden border-t border-gray-200">
             <div className="px-2 pt-2 pb-3 space-y-1">
-              <a href="#" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-gray-100 transition-colors duration-200">
-                Blogs
-              </a>
-              <a href="#" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-gray-100 transition-colors duration-200">
-                Research
-              </a>
-              <a href="#" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-gray-100 transition-colors duration-200">
-                Schemes
-              </a>
-              <a href="#" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-gray-100 transition-colors duration-200">
-                E-Paper
-              </a>
+              {categories.map((cat, idx) => {
+                const name = getCategoryName(cat)
+                const routeName = normalize(name)
+                if (!routeName) return null
+                return (
+                  <Link key={cat.id || cat._id || name + idx} to={`/${routeName}`} onClick={() => setIsMenuOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-gray-100 transition-colors duration-200 capitalize">
+                    {name}
+                  </Link>
+                )
+              })}
               {authToken ? (
                 <div className="px-2 pt-2">
                   <Link onClick={() => setIsMenuOpen(false)} to="/profile" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-gray-100 transition-colors duration-200">

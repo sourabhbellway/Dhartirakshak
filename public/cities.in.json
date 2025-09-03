@@ -1,0 +1,19 @@
+[
+  { "name": "Indore", "state": "Madhya Pradesh", "country": "IN" },
+  { "name": "Bhopal", "state": "Madhya Pradesh", "country": "IN" },
+  { "name": "Ujjain", "state": "Madhya Pradesh", "country": "IN" },
+  { "name": "Delhi", "state": "Delhi", "country": "IN" },
+  { "name": "Mumbai", "state": "Maharashtra", "country": "IN" },
+  { "name": "Pune", "state": "Maharashtra", "country": "IN" },
+  { "name": "Jaipur", "state": "Rajasthan", "country": "IN" },
+  { "name": "Ahmedabad", "state": "Gujarat", "country": "IN" },
+  { "name": "Kolkata", "state": "West Bengal", "country": "IN" },
+  { "name": "Chennai", "state": "Tamil Nadu", "country": "IN" },
+  { "name": "Bengaluru", "state": "Karnataka", "country": "IN" },
+  { "name": "Hyderabad", "state": "Telangana", "country": "IN" },
+  { "name": "Surat", "state": "Gujarat", "country": "IN" },
+  { "name": "Vadodara", "state": "Gujarat", "country": "IN" },
+  { "name": "Nagpur", "state": "Maharashtra", "country": "IN" }
+]
+
+
