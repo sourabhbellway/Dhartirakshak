@@ -36,14 +36,17 @@ const adminAds = {
     })
     return res.data
   },
-  updateImage: async (token, id, file) => {
+  update: async (token, id, values) => {
     const form = new FormData()
-    form.append('image', file)
+    Object.entries(values).forEach(([k, v]) => {
+      if (v !== undefined && v !== null) form.append(k, v)
+    })
     const res = await axios.post(`${BASE_URL}/api/admin/advertisement/update/${id}`, form, {
       headers: { Authorization: `Bearer ${token}` }
     })
     return res.data
-  }
+  },
+
 }
 
 export default adminAds

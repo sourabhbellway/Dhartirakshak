@@ -160,7 +160,7 @@ const LeftSidebar = () => {
   const normalize = (s) => (s || '').toString().trim().replace(/^\/+|\/+$/g, '').toLowerCase()
 
   return (
-    <div className="w-full h-full bg-white/95 backdrop-blur-sm border-r lg:border-r border-b lg:border-b-0 border-gray-200 p-3 sm:p-4">
+    <div className="w-full h-full bg-gray-50  border-r lg:border-r border-b lg:border-b-0 border-gray-200 p-3 sm:p-4">
       {/* Logo Section */}
       <div className="mb-4 sm:mb-6 text-center">
         <h2 className="text-lg sm:text-xl font-bold text-dark-green">Quick Access</h2>
@@ -181,6 +181,12 @@ const LeftSidebar = () => {
         )}
         {!catLoading && !catError && (
           <nav className="space-y-2 max-h-[50vh] lg:max-h-none overflow-auto lg:overflow-visible">
+            <Link
+              to="/epapers"
+              className="block px-3 py-2 text-sm text-gray-700 hover:text-dark-green hover:bg-green-50 rounded-lg transition-all duration-200"
+            >
+              E-Papers
+            </Link>
             {categories.map((cat, idx) => {
               const name = getCategoryName(cat)
               const routeName = normalize(name)

@@ -11,6 +11,7 @@ const navItems = [
   { to: '/admin/blogs', label: 'Blogs', icon: <FiFileText /> },
   { to: '/admin/research', label: 'Research', icon: <FiBookOpen /> },
   { to: '/admin/posts', label: 'Posts', icon: <FiLayers /> },
+  { to: '/admin/epapers', label: 'E-Papers', icon: <FiFileText /> },
 ]
 
 const Sidebar = ({ isOpen, onToggle, isMobile }) => {

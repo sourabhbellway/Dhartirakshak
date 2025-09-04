@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaStar, FaBookmark, FaShare } from 'react-icons/fa';
+import { FaStar, FaTimes } from 'react-icons/fa';
 import { useLocation } from 'react-router-dom'
 import advertisementPublicController from '../controllers/advertisementPublicController.js'
 import categoryPublicController from '../controllers/categoryPublicController.js'
@@ -10,6 +10,7 @@ const RightSidebar = () => {
   const [categories, setCategories] = React.useState([])
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState('')
+  const [dismissedIds, setDismissedIds] = React.useState(() => new Set())
 
   React.useEffect(() => {
     const load = async () => {
@@ -57,17 +58,10 @@ const RightSidebar = () => {
   }
 
   const resolveAdTargetUrl = (ad) => {
-    return getValidUrl(ad?.link) || getValidUrl(ad?.company) || null
+    return getValidUrl(ad?.link) || null
   }
 
-  const extractHostname = (urlString) => {
-    try {
-      const u = new URL(urlString)
-      return u.hostname.replace(/^www\./, '')
-    } catch (_) {
-      return ''
-    }
-  }
+  
 
   const filteredAds = React.useMemo(() => {
     // On home route ("/"), show only ads with no category_name
@@ -101,7 +95,7 @@ const RightSidebar = () => {
     )
   }
 
-  const advertisements = filteredAds.length ? filteredAds : []
+  const advertisements = (filteredAds.length ? filteredAds : []).filter(ad => !dismissedIds.has(String(ad.id || ad._id)))
 
   const formatDate = (iso) => {
     if (!iso) return ''
@@ -114,7 +108,7 @@ const RightSidebar = () => {
   }
 
   return (
-    <div className="w-full h-full bg-white/95 backdrop-blur-sm border-l lg:border-l border-t lg:border-t-0 border-gray-200 p-3 sm:p-4">
+    <div className="w-full h-full bg-gray-50  border-l lg:border-l border-t lg:border-t-0 border-gray-200 p-3 sm:p-4">
       {/* Header */}
       <div className="mb-4 sm:mb-6 text-center">
         <h2 className="text-lg sm:text-xl font-bold text-dark-green">Featured & Ads</h2>
@@ -131,10 +125,19 @@ const RightSidebar = () => {
           <div className="space-y-4">
             {advertisements.map((ad) => {
               const targetUrl = resolveAdTargetUrl(ad)
-              const companyUrl = getValidUrl(ad?.company)
-              const companyHost = companyUrl ? extractHostname(companyUrl) : (ad?.company || '')
+              const companyHost = ad?.company || ''
               return (
-                <div key={ad.id || ad._id} className="bg-gradient-to-br from-green-50 to-yellow-50 rounded-lg p-3 sm:p-3 border border-green-200 hover:shadow-md transition-all duration-200">
+                <div key={ad.id || ad._id} className="relative bg-white rounded-lg p-3 sm:p-3 border border-gray-200 hover:shadow-md transition-all duration-200">
+                  {/* Dismiss (X) */}
+                  <button
+                    aria-label="Dismiss ad"
+                    className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
+                    onClick={() => setDismissedIds(prev => new Set(prev).add(String(ad.id || ad._id)))}
+                  >
+                    <FaTimes />
+                  </button>
+                  {/* Ad badge */}
+                  <div className="absolute -top-2 left-3 bg-yellow-500 text-white text-[10px] px-2 py-0.5 rounded-full shadow">Ad</div>
                   <div className="flex items-start gap-3">
                     {ad.image && (
                       targetUrl ? (
@@ -148,11 +151,11 @@ const RightSidebar = () => {
                     <div className="flex-1 min-w-0">
                       {ad.title ? (
                         targetUrl ? (
-                          <a href={targetUrl} target="_blank" rel="noopener noreferrer" className="font-semibold text-dark-green text-sm mb-1 line-clamp-2 block">
+                          <a href={targetUrl} target="_blank" rel="noopener noreferrer" className="font-semibold text-gray-900 text-sm mb-1 line-clamp-2 block hover:underline">
                             {ad.title}
                           </a>
                         ) : (
-                          <h4 className="font-semibold text-dark-green text-sm mb-1 line-clamp-2">{ad.title}</h4>
+                          <h4 className="font-semibold text-gray-900 text-sm mb-1 line-clamp-2">{ad.title}</h4>
                         )
                       ) : null}
                       {ad.description && (
@@ -160,30 +163,16 @@ const RightSidebar = () => {
                       )}
                       <div className="flex items-center justify-between">
                         <div className="text-[11px] text-gray-600 truncate">
-                          {companyUrl ? (
-                            <a href={companyUrl} target="_blank" rel="noopener noreferrer" className="hover:text-dark-green underline">
-                              {companyHost}
-                            </a>
-                          ) : (
-                            companyHost || null
-                          )}
+                          {companyHost || null}
                         </div>
-                        <div className="text-[11px] text-gray-500 ml-2 whitespace-nowrap">
-                          {formatDate(ad.created_at)}
-                        </div>
-                      </div>
-                      <div className="flex gap-2 mt-2">
                         {targetUrl && (
-                          <a href={targetUrl} target="_blank" rel="noopener noreferrer" className="flex-1 bg-dark-green text-white py-2 px-3 rounded-lg text-xs font-medium hover:bg-green-700 transition-colors text-center">
-                            Visit
-                          </a>
+                          <a href={targetUrl} target="_blank" rel="noopener noreferrer" className="ml-2 text-[11px] text-dark-green hover:underline whitespace-nowrap">Visit site</a>
                         )}
-                        <button className="p-2 text-gray-500 hover:text-dark-green transition-colors">
-                          <FaBookmark />
-                        </button>
-                        <button className="p-2 text-gray-500 hover:text-dark-green transition-colors">
-                          <FaShare />
-                        </button>
+                      </div>
+                      {/* footer */}
+                      <div className="mt-2 flex items-center justify-between">
+                        <span className="text-[10px] text-gray-400">Sponsored</span>
+                        <span className="text-[10px] text-gray-400">{formatDate(ad.created_at)}</span>
                       </div>
                     </div>
                   </div>

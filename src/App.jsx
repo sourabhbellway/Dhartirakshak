@@ -11,9 +11,11 @@ import Banners from "./admin/pages/Banners.jsx";
 import News from "./admin/pages/News.jsx";
 import Advertisements from "./admin/pages/Advertisements.jsx";
 import BusinessSettings from "./admin/pages/BusinessSettings.jsx";
+import EPapers from "./admin/pages/EPapers.jsx";
 import MainLayout from "./layout/MainLayout.jsx";
 import Blogs from "./pages/Blogs.jsx";
 import Schemes from "./pages/Schemes.jsx";
+import EPapersPublic from "./pages/EPapers.jsx";
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated } = useAuth();
@@ -36,6 +38,14 @@ const App = () => {
           <Route path="/" element={<Home />} />
           <Route path="/blogs" element={<Blogs />} />
           <Route path="/schemes" element={<Schemes />} />
+          <Route
+            path="/epapers"
+            element={
+              <UserPrivateRoute>
+                <EPapersPublic />
+              </UserPrivateRoute>
+            }
+          />
           <Route
             path="/profile"
             element={
@@ -61,6 +71,7 @@ const App = () => {
           <Route path="news" element={<News />} />
           <Route path="advertisements" element={<Advertisements />} />
           <Route path="business-settings" element={<BusinessSettings />} />
+          <Route path="epapers" element={<EPapers />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />

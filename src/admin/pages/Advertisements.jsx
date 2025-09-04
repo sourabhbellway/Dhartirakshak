@@ -17,14 +17,15 @@ const Advertisements = () => {
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [previewSrc, setPreviewSrc] = useState(null)
   const [openCreate, setOpenCreate] = useState(false)
-  const [openUpdateImage, setOpenUpdateImage] = useState(null) // id or null
-  const [createValues, setCreateValues] = useState({ title: '', description: '', company: '', image: null, is_active: 1, category_id: '' })
-  const [updateFile, setUpdateFile] = useState(null)
+  const [openUpdate, setOpenUpdate] = useState(null) // { id, currentImage } or null
+  const [openDescription, setOpenDescription] = useState(null) // ad data or null
+  const [createValues, setCreateValues] = useState({ title: '', description: '', company: '', link: '', image: null, category_id: '', start_date: '', end_date: '' })
+  const [updateValues, setUpdateValues] = useState({ title: '', description: '', company: '', link: '', image: null, category_id: '', start_date: '', end_date: '' })
   const [categories, setCategories] = useState([])
   const [openNewCategory, setOpenNewCategory] = useState(false)
   const [newCategory, setNewCategory] = useState('')
+  const [imagePreviewUrl, setImagePreviewUrl] = useState(null)
 
   const fetchData = async () => {
     setLoading(true); setError('')
@@ -50,25 +51,94 @@ const Advertisements = () => {
     }
   }
 
+  const getCategoryIdByName = (categoryName) => {
+    if (!categoryName) return ''
+    const cat = categories.find(c => (c.category || c.name || c.title) === categoryName)
+    return cat ? String(cat.id || cat._id) : ''
+  }
+
+  const getCategoryNameById = (categoryId) => {
+    if (!categoryId) return ''
+    const cat = categories.find(c => (c.id || c._id) == categoryId)
+    return cat ? (cat.category || cat.name || cat.title) : ''
+  }
+
   useEffect(() => { fetchData(); fetchCategories(); }, [])
+
+  // Cleanup image preview URL when component unmounts or image changes
+  useEffect(() => {
+    return () => {
+      if (imagePreviewUrl) {
+        URL.revokeObjectURL(imagePreviewUrl)
+      }
+    }
+  }, [imagePreviewUrl])
+
+  // Update image preview URL when updateValues.image changes
+  useEffect(() => {
+    if (updateValues.image) {
+      if (imagePreviewUrl) {
+        URL.revokeObjectURL(imagePreviewUrl)
+      }
+      setImagePreviewUrl(URL.createObjectURL(updateValues.image))
+    } else {
+      if (imagePreviewUrl) {
+        URL.revokeObjectURL(imagePreviewUrl)
+        setImagePreviewUrl(null)
+      }
+    }
+  }, [updateValues.image])
 
   const columns = [
     { key: 'id', title: 'ID' },
     { key: 'title', title: 'Title' },
     { key: 'company', title: 'Company' },
-    { key: 'description', title: 'Description' },
-    { key: 'image', title: 'Image', render: (val) => (
-      val ? (
-        <button onClick={() => setPreviewSrc(fullImageUrl(val))} className="px-3 py-1 rounded-full text-xs bg-emerald-100 text-emerald-900 hover:bg-emerald-200">Preview</button>
-      ) : (
-        <span className="px-3 py-1 rounded-full text-xs bg-gray-200 text-gray-700">No Image</span>
-      )
+    { key: 'description', title: 'Description', render: (val) => (
+      <div className="max-w-xs">
+        {val && val.length > 50 ? (
+          <div>
+            <p className="text-sm text-gray-700 line-clamp-2">{val.substring(0, 50)}...</p>
+            <button 
+              onClick={() => setOpenDescription(rows.find(r => r.description === val))}
+              className="text-xs text-blue-600 hover:text-blue-800 underline"
+            >
+              Read more
+            </button>
+          </div>
+        ) : (
+          <span className="text-sm text-gray-700">{val || '-'}</span>
+        )}
+      </div>
     ) },
     { key: 'is_active', title: 'Status', render: (val) => (
       <span className={`px-3 py-1 rounded-full text-xs ${val ? 'bg-emerald-600 text-white' : 'bg-rose-500 text-white'}`}>{val ? 'Active' : 'Inactive'}</span>
     ) },
+    { key: 'link', title: 'Link', render: (val) => (
+      val ? (
+        <a href={val} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 text-sm underline truncate block max-w-xs">
+          {val.length > 30 ? val.substring(0, 30) + '...' : val}
+        </a>
+      ) : (
+        <span className="text-sm text-gray-500">-</span>
+      )
+    ) },
     { key: 'created_at', title: 'Created' },
   ]
+
+  const dateFormat = (value) => {
+    if (!value) return '-'
+    try {
+      const d = new Date(value)
+      if (Number.isNaN(d.getTime())) return value
+      return d.toISOString().slice(0, 10)
+    } catch { return value }
+  }
+
+  // Insert date columns after description
+  columns.splice(4, 0,
+    { key: 'start_date', title: 'Start Date', render: (val) => dateFormat(val) },
+    { key: 'end_date', title: 'End Date', render: (val) => dateFormat(val) }
+  )
 
   const handleDelete = async (id) => {
     if (!confirm('Delete this advertisement?')) return
@@ -113,26 +183,68 @@ const Advertisements = () => {
       return
     }
     try {
+      console.log('Creating with values:', createValues)
       await adminAds.create(token, createValues)
       toast.success('Advertisement created')
       setOpenCreate(false)
-      setCreateValues({ title: '', description: '', company: '', image: null, is_active: 1, category_id: '' })
+      setCreateValues({ title: '', description: '', company: '', link: '', image: null, category_id: '', start_date: '', end_date: '' })
       fetchData()
     } catch (e) {
+      console.error('Create error:', e)
       toast.error('Create failed')
     }
   }
 
-  const handleUpdateImage = async (e) => {
+
+  const handleOpenUpdate = (row) => {
+    // Clean up previous image preview URL
+    if (imagePreviewUrl) {
+      URL.revokeObjectURL(imagePreviewUrl)
+      setImagePreviewUrl(null)
+    }
+    
+    setUpdateValues({
+      title: row.title || '',
+      description: row.description || '',
+      company: row.company || '',
+      link: row.link || '',
+      image: null,
+      category_id: getCategoryIdByName(row.category_name),
+      start_date: row.start_date ? row.start_date.split('T')[0] : '',
+      end_date: row.end_date ? row.end_date.split('T')[0] : ''
+    })
+
+
+
+    
+    setOpenUpdate({ id: row.id, currentImage: row.image })
+  }
+
+  const handleUpdateChange = (e) => {
+    const { name, value } = e.target
+    setUpdateValues(v => ({ ...v, [name]: value }))
+  }
+
+  const handleUpdateSubmit = async (e) => {
     e.preventDefault()
-    if (!openUpdateImage || !updateFile) return
+    if (!updateValues.title || !updateValues.company) {
+      toast.error('Title and Company are required')
+      return
+    }
     try {
-      await adminAds.updateImage(token, openUpdateImage, updateFile)
-      toast.success('Image updated')
-      setOpenUpdateImage(null)
-      setUpdateFile(null)
+      console.log('Updating with values:', updateValues)
+      await adminAds.update(token, openUpdate.id, updateValues)
+      toast.success('Advertisement updated')
+      setOpenUpdate(null)
+      setUpdateValues({ title: '', description: '', company: '', link: '', image: null, category_id: '', start_date: '', end_date: '' })
+      // Clean up image preview URL
+      if (imagePreviewUrl) {
+        URL.revokeObjectURL(imagePreviewUrl)
+        setImagePreviewUrl(null)
+      }
       fetchData()
     } catch (e) {
+      console.error('Update error:', e)
       toast.error('Update failed')
     }
   }
@@ -169,40 +281,71 @@ const Advertisements = () => {
         loading={loading}
         actions={(row) => (
           <div className="flex items-center gap-2">
-            <button onClick={() => setOpenUpdateImage(row.id)} className="px-3 py-1 rounded-full text-xs bg-sky-600 text-white hover:bg-sky-700">Update Image</button>
-            <button onClick={() => handleActivate(row.id)} className="px-3 py-1 rounded-full text-xs bg-emerald-600 text-white hover:bg-emerald-700">Activate</button>
-            <button onClick={() => handleDeactivate(row.id)} className="px-3 py-1 rounded-full text-xs bg-amber-500 text-white hover:bg-amber-600">Deactivate</button>
+            <button onClick={() => handleOpenUpdate(row)} className="px-3 py-1 rounded-full text-xs bg-blue-600 text-white hover:bg-blue-700">Update</button>
+            {row.is_active ? (
+              <button onClick={() => handleDeactivate(row.id)} className="px-3 py-1 rounded-full text-xs bg-amber-500 text-white hover:bg-amber-600">Deactivate</button>
+            ) : (
+              <button onClick={() => handleActivate(row.id)} className="px-3 py-1 rounded-full text-xs bg-emerald-600 text-white hover:bg-emerald-700">Activate</button>
+            )}
             <button onClick={() => handleDelete(row.id)} className="px-3 py-1 rounded-full text-xs bg-rose-600 text-white hover:bg-rose-700">Delete</button>
           </div>
         )}
       />
-
-      {previewSrc && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center" onClick={() => setPreviewSrc(null)}>
-          <div className="bg-white rounded-2xl p-3 max-w-3xl w-[90%]" onClick={(e) => e.stopPropagation()}>
-            <img src={previewSrc} alt="preview" className="w-full h-auto rounded-xl" />
-            <div className="text-right mt-3">
-              <button onClick={() => setPreviewSrc(null)} className="px-4 py-1.5 rounded-full bg-emerald-600 text-white">Close</button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {openCreate && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center" onClick={() => setOpenCreate(false)}>
           <div className="bg-white rounded-2xl p-5 max-w-xl w-[92%]" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-dark-green text-lg font-semibold mb-3">Create Advertisement</h3>
             <form onSubmit={handleCreateSubmit} className="space-y-3">
-              <input className="w-full border border-emerald-200 rounded-lg p-2 text-sm" name="title" placeholder="Title" value={createValues.title} onChange={handleCreateChange} required />
-              <input className="w-full border border-emerald-200 rounded-lg p-2 text-sm" name="company" placeholder="Company" value={createValues.company} onChange={handleCreateChange} required />
-              <textarea className="w-full border border-emerald-200 rounded-lg p-2 text-sm" name="description" placeholder="Description" value={createValues.description} onChange={handleCreateChange} />
-              {/* Category Dropdown (saves category_id) */}
-              <select name="category_id" value={createValues.category_id} onChange={handleCreateChange} className="w-full border border-emerald-200 rounded-lg p-2 text-sm">
-                <option value="" disabled>Select Category</option>
-                {categories.map((cat) => (
-                  <option key={cat.id || cat._id} value={cat.id || cat._id}>{cat.category || cat.name || cat.title}</option>
-                ))}
-              </select>
+              {/* Row 1: Title and Company */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs text-gray-700 mb-1">Title *</label>
+                  <input className="w-full border border-emerald-200 rounded-lg p-2 text-sm" name="title" placeholder="Title" value={createValues.title} onChange={handleCreateChange} required />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-700 mb-1">Company *</label>
+                  <input className="w-full border border-emerald-200 rounded-lg p-2 text-sm" name="company" placeholder="Company" value={createValues.company} onChange={handleCreateChange} required />
+                </div>
+              </div>
+
+              {/* Row 2: Link and Category */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs text-gray-700 mb-1">Link</label>
+                  <input className="w-full border border-emerald-200 rounded-lg p-2 text-sm" name="link" placeholder="Link (optional)" value={createValues.link} onChange={handleCreateChange} />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-700 mb-1">Category</label>
+                  <select name="category_id" value={createValues.category_id || ''} onChange={handleCreateChange} className="w-full border border-emerald-200 rounded-lg p-2 text-sm">
+                    <option value="">Select Category</option>
+                    {categories.map((cat) => (
+                      <option key={cat.id || cat._id} value={cat.id || cat._id}>{cat.category || cat.name || cat.title}</option>
+                    ))}
+                  </select>
+                  {createValues.category_id && (
+                    <p className="text-xs text-gray-600 mt-1">Selected: {getCategoryNameById(createValues.category_id)}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Row 3: Start Date and End Date */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs text-gray-700 mb-1">Start Date</label>
+                  <input type="date" className="w-full border border-emerald-200 rounded-lg p-2 text-sm" name="start_date" value={createValues.start_date} onChange={handleCreateChange} />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-700 mb-1">End Date</label>
+                  <input type="date" className="w-full border border-emerald-200 rounded-lg p-2 text-sm" name="end_date" value={createValues.end_date} onChange={handleCreateChange} />
+                </div>
+              </div>
+
+              {/* Row 4: Description (full width) */}
+              <div>
+                <label className="block text-xs text-gray-700 mb-1">Description</label>
+                <textarea className="w-full border border-emerald-200 rounded-lg p-2 text-sm" name="description" placeholder="Description" value={createValues.description} onChange={handleCreateChange} rows={3} />
+              </div>
               {/* Image Dropzone */}
               <FileDropzone label="Image" accept="image/*" value={createValues.image} onChange={(file) => setCreateValues(v => ({ ...v, image: file }))} required heightClass="h-44" />
               <div className="flex items-center justify-end gap-2 pt-2">
@@ -214,17 +357,185 @@ const Advertisements = () => {
         </div>
       )}
 
-      {openUpdateImage && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center" onClick={() => setOpenUpdateImage(null)}>
-          <div className="bg-white rounded-2xl p-5 max-w-md w-[92%]" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-dark-green text-lg font-semibold mb-3">Update Image</h3>
-            <form onSubmit={handleUpdateImage} className="space-y-3">
-              <FileDropzone label="New Image" accept="image/*" value={updateFile} onChange={(file) => setUpdateFile(file)} required heightClass="h-40" />
+      {openUpdate && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center" onClick={() => {
+          setOpenUpdate(null)
+          if (imagePreviewUrl) {
+            URL.revokeObjectURL(imagePreviewUrl)
+            setImagePreviewUrl(null)
+          }
+        }}>
+          <div className="bg-white rounded-2xl p-5 max-w-2xl w-[92%] max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-dark-green text-lg font-semibold mb-3">Update Advertisement</h3>
+            
+            {/* Image Section */}
+            <div className="mb-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Current Image */}
+                {openUpdate.currentImage && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Current Image</label>
+                    <div className="text-center">
+                      <img src={fullImageUrl(openUpdate.currentImage)} alt="Current" className="h-50 rounded-lg mx-auto border border-gray-200" />
+                    </div>
+                  </div>
+                )}
+                
+                {/* New Image Preview */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">New Image</label>
+                  {imagePreviewUrl ? (
+                    <div className="text-center">
+                      <img src={imagePreviewUrl} alt="New" className="h-50 rounded-lg mx-auto border border-gray-200" />
+                      <button 
+                        type="button"
+                        onClick={() => setUpdateValues(v => ({ ...v, image: null }))}
+                        className="mt-2 px-3 py-1 text-xs bg-red-100 text-red-700 rounded-full hover:bg-red-200"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                      <p className="text-sm text-gray-500">No new image selected</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            
+            <form onSubmit={handleUpdateSubmit} className="space-y-3">
+              {/* Row 1: Title and Company */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs text-gray-700 mb-1">Title *</label>
+                  <input className="w-full border border-emerald-200 rounded-lg p-2 text-sm" name="title" placeholder="Title" value={updateValues.title} onChange={handleUpdateChange} required />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-700 mb-1">Company *</label>
+                  <input className="w-full border border-emerald-200 rounded-lg p-2 text-sm" name="company" placeholder="Company" value={updateValues.company} onChange={handleUpdateChange} required />
+                </div>
+              </div>
+
+              {/* Row 2: Link and Category */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs text-gray-700 mb-1">Link</label>
+                  <input className="w-full border border-emerald-200 rounded-lg p-2 text-sm" name="link" placeholder="Link (optional)" value={updateValues.link} onChange={handleUpdateChange} />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-700 mb-1">Category</label>
+                                     <select name="category_id" value={updateValues.category_id || ''} onChange={handleUpdateChange} className="w-full border border-emerald-200 rounded-lg p-2 text-sm">
+                     <option value="">Select Category</option>
+                     {categories.map((cat) => {
+                       const catId = String(cat.id || cat._id)
+                       return (
+                         <option key={catId} value={catId}>{cat.category || cat.name || cat.title}</option>
+                       )
+                     })}
+                   </select>
+                  {updateValues.category_id && (
+                    <p className="text-xs text-gray-600 mt-1">Selected: {getCategoryNameById(updateValues.category_id)}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Row 3: Start Date and End Date */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs text-gray-700 mb-1">Start Date</label>
+                  <input type="date" className="w-full border border-emerald-200 rounded-lg p-2 text-sm" name="start_date" value={updateValues.start_date} onChange={handleUpdateChange} />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-700 mb-1">End Date</label>
+                  <input type="date" className="w-full border border-emerald-200 rounded-lg p-2 text-sm" name="end_date" value={updateValues.end_date} onChange={handleUpdateChange} />
+                </div>
+              </div>
+
+              {/* Row 4: Description (full width) */}
+              <div>
+                <label className="block text-xs text-gray-700 mb-1">Description</label>
+                <textarea className="w-full border border-emerald-200 rounded-lg p-2 text-sm" name="description" placeholder="Description" value={updateValues.description} onChange={handleUpdateChange} rows={3} />
+              </div>
+              
+              {/* Image Update Section */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Select New Image (optional)</label>
+                <FileDropzone label="Choose Image" accept="image/*" value={updateValues.image} onChange={(file) => setUpdateValues(v => ({ ...v, image: file }))} heightClass="h-20" />
+              </div>
               <div className="flex items-center justify-end gap-2 pt-2">
-                <button type="button" onClick={() => setOpenUpdateImage(null)} className="px-4 py-2 rounded-full bg-emerald-100 text-emerald-900">Cancel</button>
-                <button type="submit" className="px-4 py-2 rounded-full bg-sky-600 text-white">Update</button>
+                <button type="button" onClick={() => {
+                  setOpenUpdate(null)
+                  if (imagePreviewUrl) {
+                    URL.revokeObjectURL(imagePreviewUrl)
+                    setImagePreviewUrl(null)
+                  }
+                }} className="px-4 py-2 rounded-full bg-emerald-100 text-emerald-900">Cancel</button>
+                <button type="submit" className="px-4 py-2 rounded-full bg-blue-600 text-white">Update</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {openDescription && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center" onClick={() => setOpenDescription(null)}>
+          <div className="bg-white rounded-2xl p-5 max-w-2xl w-[92%]" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-dark-green text-lg font-semibold mb-3">Advertisement Details</h3>
+            <div className="space-y-4">
+              {openDescription.image && (
+                <div className="text-center">
+                  <img src={fullImageUrl(openDescription.image)} alt={openDescription.title || 'ad'} className="w-full max-w-md h-auto rounded-lg mx-auto" />
+                </div>
+              )}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                  <p className="text-sm text-gray-900">{openDescription.title || '-'}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Company</label>
+                  <p className="text-sm text-gray-900">{openDescription.company || '-'}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                  <p className="text-sm text-gray-900">{openDescription.category_name || '-'}</p>
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                  <p className="text-sm text-gray-900 whitespace-pre-wrap">{openDescription.description || '-'}</p>
+                </div>
+                {openDescription.link && (
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Link</label>
+                    <a href={openDescription.link} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:text-blue-800 underline break-all">
+                      {openDescription.link}
+                    </a>
+                  </div>
+                )}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                  <p className="text-sm text-gray-900">{dateFormat(openDescription.start_date)}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                  <p className="text-sm text-gray-900">{dateFormat(openDescription.end_date)}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                  <span className={`px-2 py-1 rounded-full text-xs ${openDescription.is_active ? 'bg-emerald-600 text-white' : 'bg-rose-500 text-white'}`}>
+                    {openDescription.is_active ? 'Active' : 'Inactive'}
+                  </span>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Created</label>
+                  <p className="text-sm text-gray-900">{dateFormat(openDescription.created_at)}</p>
+                </div>
+              </div>
+            </div>
+            <div className="text-right mt-4">
+              <button onClick={() => setOpenDescription(null)} className="px-4 py-2 rounded-full bg-emerald-600 text-white">Close</button>
+            </div>
           </div>
         </div>
       )}
