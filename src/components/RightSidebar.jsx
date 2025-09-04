@@ -1,13 +1,16 @@
 import React from 'react';
-import { FaStar, FaTimes } from 'react-icons/fa';
+import { FaStar, FaTimes, FaFire } from 'react-icons/fa';
 import { useLocation } from 'react-router-dom'
 import advertisementPublicController from '../controllers/advertisementPublicController.js'
 import categoryPublicController from '../controllers/categoryPublicController.js'
+import newsPublicController from '../controllers/newsPublicController.js'
 
 const RightSidebar = () => {
   const location = useLocation()
   const [ads, setAds] = React.useState([])
   const [categories, setCategories] = React.useState([])
+  const [trending, setTrending] = React.useState([])
+  const [expandedTrending, setExpandedTrending] = React.useState(() => new Set())
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState('')
   const [dismissedIds, setDismissedIds] = React.useState(() => new Set())
@@ -16,14 +19,17 @@ const RightSidebar = () => {
     const load = async () => {
       setLoading(true); setError('')
       try {
-        const [adsRes, catRes] = await Promise.all([
+        const [adsRes, catRes, trendRes] = await Promise.all([
           advertisementPublicController.list(),
-          categoryPublicController.list()
+          categoryPublicController.list(),
+          newsPublicController.listTrending()
         ])
         const adsData = adsRes?.data || adsRes || []
         const catData = catRes?.data || catRes || []
+        const trendData = trendRes?.data || trendRes || []
         setAds(Array.isArray(adsData) ? adsData : [])
         setCategories(Array.isArray(catData) ? catData : [])
+        setTrending(Array.isArray(trendData) ? trendData : [])
       } catch (e) {
         setError('Failed to load advertisements')
       } finally {
@@ -107,6 +113,14 @@ const RightSidebar = () => {
     }
   }
 
+  const toggleTrendingExpand = (key) => {
+    setExpandedTrending(prev => {
+      const next = new Set(prev)
+      if (next.has(key)) next.delete(key); else next.add(key)
+      return next
+    })
+  }
+
   return (
     <div className="w-full h-full bg-gray-50  border-l lg:border-l border-t lg:border-t-0 border-gray-200 p-3 sm:p-4">
       {/* Header */}
@@ -137,7 +151,7 @@ const RightSidebar = () => {
                     <FaTimes />
                   </button>
                   {/* Ad badge */}
-                  <div className="absolute -top-2 left-3 bg-yellow-500 text-white text-[10px] px-2 py-0.5 rounded-full shadow">Ad</div>
+                  <div className="absolute -top-2 left-3 bg-yellow-500 text-white text-[9px] px-2 py-0.5 rounded-full shadow animate-pulse">Ad</div>
                   <div className="flex items-start gap-3">
                     {ad.image && (
                       targetUrl ? (
@@ -183,8 +197,51 @@ const RightSidebar = () => {
         </div>
       )}
 
-  
-   
+      {/* Trending News */}
+      {Array.isArray(trending) && trending.length > 0 && (
+        <div className="mt-6 sm:mt-8">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">Trending News</h3>
+          <div className="space-y-3">
+            {trending.slice(0, 6).map((item, idx) => (
+              <article key={item.id || item._id || idx} className="relative bg-white rounded-lg p-3 border border-gray-200 hover:shadow-sm transition-all duration-200">
+                <div className="absolute top-1 right-1 flex items-center gap-1 bg-rose-100 text-rose-700 text-[9px] px-2 py-0.5 rounded-full border border-red-200 shadow-sm animate-pulse">
+                  <FaFire className="text-rose-500" />
+                  <span className="font-semibold ">Trending Now</span>
+                </div>
+                <div className="flex items-start gap-3">
+                  {item.image ? (
+                    <img src={item.image} alt={item.title || 'trending'} className="w-16 h-16 object-cover rounded-md border" />
+                  ) : (
+                    <div className="w-16 h-16 rounded-md border bg-gray-100 flex items-center justify-center text-gray-400 text-xs">No image</div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    {item.title && (
+                      <h4 className="font-semibold text-gray-900 text-sm mb-1 line-clamp-2">{item.title}</h4>
+                    )}
+                    {(() => {
+                      const key = item.id || item._id || idx
+                      const isExpanded = expandedTrending.has(key)
+                      return item.description ? (
+                        <>
+                          <p className={`text-xs text-gray-600 break-words ${isExpanded ? '' : 'line-clamp-3'}`}>{item.description}</p>
+                          <button
+                            type="button"
+                            onClick={() => toggleTrendingExpand(key)}
+                            className="mt-1 text-[11px] text-dark-green hover:underline"
+                          >
+                            {isExpanded ? 'Show less' : 'Read more'}
+                          </button>
+                        </>
+                      ) : null
+                    })()}
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      )}
+ 
     </div>
   );
 };

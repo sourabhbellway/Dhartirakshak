@@ -11,7 +11,7 @@ const NewsFeed = () => {
     const load = async () => {
       setLoading(true); setError('')
       try {
-        const res = await newsPublicController.listTrending()
+        const res = await newsPublicController.listAgricultureNews()
         const data = res?.data || res || []
         const parsed = Array.isArray(data) ? data : []
         setNewsArticles(parsed)

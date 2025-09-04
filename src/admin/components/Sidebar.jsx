@@ -3,20 +3,29 @@ import { Link, useLocation } from 'react-router-dom'
 import { FiMenu, FiX, FiHome, FiFileText, FiBookOpen, FiLayers } from 'react-icons/fi'
 import logo from "../../assets/DR-Logo.png";
 const navItems = [
-  { to: '/admin', label: 'Dashboard', icon: <FiHome /> },
-  { to: '/admin/banners', label: 'Banners', icon: <FiLayers /> },
-  { to: '/admin/news', label: 'News', icon: <FiFileText /> },
-  { to: '/admin/advertisements', label: 'Advertisements', icon: <FiFileText /> },
-  { to: '/admin/business-settings', label: 'Business Settings', icon: <FiLayers /> },
-  { to: '/admin/blogs', label: 'Blogs', icon: <FiFileText /> },
-  { to: '/admin/research', label: 'Research', icon: <FiBookOpen /> },
-  { to: '/admin/posts', label: 'Posts', icon: <FiLayers /> },
-  { to: '/admin/epapers', label: 'E-Papers', icon: <FiFileText /> },
+  { type: 'link', to: '/admin', label: 'Dashboard', icon: <FiHome /> },
+  { type: 'link', to: '/admin/banners', label: 'Banners', icon: <FiLayers /> },
+  {
+    type: 'group',
+    label: 'News',
+    icon: <FiFileText />,
+    children: [
+      { to: '/admin/news', label: 'Agriculture News' },
+      { to: '/admin/trending-news', label: 'Trending News' },
+    ]
+  },
+  { type: 'link', to: '/admin/advertisements', label: 'Advertisements', icon: <FiFileText /> },
+  { type: 'link', to: '/admin/business-settings', label: 'Business Settings', icon: <FiLayers /> },
+  { type: 'link', to: '/admin/blogs', label: 'Blogs', icon: <FiFileText /> },
+  { type: 'link', to: '/admin/research', label: 'Research', icon: <FiBookOpen /> },
+  { type: 'link', to: '/admin/posts', label: 'Posts', icon: <FiLayers /> },
+  { type: 'link', to: '/admin/epapers', label: 'E-Papers', icon: <FiFileText /> },
 ]
 
 const Sidebar = ({ isOpen, onToggle, isMobile }) => {
   const location = useLocation()
   const [collapsed, setCollapsed] = useState(false)
+  const [openGroups, setOpenGroups] = useState({})
 
   const handleCollapse = () => setCollapsed(!collapsed)
 
@@ -44,14 +53,48 @@ const Sidebar = ({ isOpen, onToggle, isMobile }) => {
 
         {/* Nav */}
         <nav className="mt-4">
-          {navItems.map(item => {
+          {navItems.map((item, idx) => {
+            if (item.type === 'group') {
+              const isOpen = !!openGroups[item.label]
+              const isActive = item.children?.some(c => location.pathname === c.to)
+              return (
+                <div key={`group-${item.label}-${idx}`}>
+                  <button
+                    type="button"
+                    onClick={() => setOpenGroups(v => ({ ...v, [item.label]: !isOpen }))}
+                    className={`w-full flex items-center justify-between px-4 py-3 hover:bg-olive/60 transition-colors ${isActive ? 'bg-olive/80 text-dark-green' : 'text-green'}`}
+                  >
+                    <span className="flex items-center gap-3">
+                      <span className="text-dark-green">{item.icon}</span>
+                      {!collapsed && <span className="text-sm font-medium">{item.label}</span>}
+                    </span>
+                    {!collapsed && <span className={`transition-transform ${isOpen ? 'rotate-90' : 'rotate-0'}`}>▸</span>}
+                  </button>
+                  {!collapsed && isOpen && (
+                    <div className="pl-10 pr-4 py-1">
+                      {item.children.map(child => {
+                        const activeChild = location.pathname === child.to
+                        return (
+                          <Link
+                            key={child.to}
+                            to={child.to}
+                            className={`block py-2 text-sm hover:text-dark-green ${activeChild ? 'text-dark-green font-medium' : 'text-green'}`}
+                          >
+                            {child.label}
+                          </Link>
+                        )
+                      })}
+                    </div>
+                  )}
+                </div>
+              )
+            }
             const active = location.pathname === item.to
             return (
               <Link
                 key={item.to}
                 to={item.to}
-                className={`flex items-center gap-3 px-4 py-3 hover:bg-olive/60 transition-colors
-                ${active ? 'bg-olive/80 text-dark-green' : 'text-green'}`}
+                className={`flex items-center gap-3 px-4 py-3 hover:bg-olive/60 transition-colors ${active ? 'bg-olive/80 text-dark-green' : 'text-green'}`}
               >
                 <span className="text-dark-green">{item.icon}</span>
                 {!collapsed && <span className="text-sm font-medium">{item.label}</span>}

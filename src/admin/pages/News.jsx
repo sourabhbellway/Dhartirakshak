@@ -176,7 +176,7 @@ const News = () => {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-dark-green text-xl font-semibold">Trending News</h2>
+        <h2 className="text-dark-green text-xl font-semibold">Agriculture News</h2>
         <button onClick={() => setOpenCreate(true)} className="px-4 py-2 rounded-full bg-emerald-700 hover:bg-emerald-800 text-white text-sm">Create News</button>
       </div>
 

@@ -12,6 +12,7 @@ import News from "./admin/pages/News.jsx";
 import Advertisements from "./admin/pages/Advertisements.jsx";
 import BusinessSettings from "./admin/pages/BusinessSettings.jsx";
 import EPapers from "./admin/pages/EPapers.jsx";
+import TrendingNews from "./admin/pages/TrendingNews.jsx";
 import MainLayout from "./layout/MainLayout.jsx";
 import Blogs from "./pages/Blogs.jsx";
 import Schemes from "./pages/Schemes.jsx";
@@ -69,6 +70,7 @@ const App = () => {
           <Route index element={<Dashboard />} />
           <Route path="banners" element={<Banners />} />
           <Route path="news" element={<News />} />
+          <Route path="trending-news" element={<TrendingNews />} />
           <Route path="advertisements" element={<Advertisements />} />
           <Route path="business-settings" element={<BusinessSettings />} />
           <Route path="epapers" element={<EPapers />} />
