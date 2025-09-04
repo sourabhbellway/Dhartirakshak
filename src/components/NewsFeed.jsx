@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { FaHeart, FaComment, FaShare, FaBookmark, FaEye, FaClock, FaUser } from 'react-icons/fa';
+import { FaEye, FaClock } from 'react-icons/fa';
 import newsPublicController from '../controllers/newsPublicController.js'
 
 const NewsFeed = () => {
-  const [likedPosts, setLikedPosts] = useState(new Set());
   const [newsArticles, setNewsArticles] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -25,17 +24,7 @@ const NewsFeed = () => {
     load()
   }, [])
 
-  const handleLike = (postId) => {
-    setLikedPosts(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(postId)) {
-        newSet.delete(postId);
-      } else {
-        newSet.add(postId);
-      }
-      return newSet;
-    });
-  };
+  // UI is read-only per requirements
 
   return (
     <div className="w-full h-full bg-gray-50 p-3 sm:p-4">
@@ -66,79 +55,37 @@ const NewsFeed = () => {
                   <div className="w-full sm:w-24 sm:h-24 h-40 rounded-md border bg-gray-100 flex items-center justify-center text-gray-400 text-sm">No image</div>
                 )}
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-base sm:text-lg font-bold text-gray-800 mb-2 line-clamp-2">
-                    {article.title}
-                  </h3>
+                  <h3 className="text-base sm:text-lg font-bold text-gray-800 mb-1 line-clamp-2">{article.title}</h3>
+                  {article.heading && (
+                    <p className="text-[13px] sm:text-sm text-gray-700 mb-2 line-clamp-1">{article.heading}</p>
+                  )}
                   
                   <p className="text-gray-600 text-sm mb-3 line-clamp-3 break-words">
                     {article.description}
                   </p>
 
                   {/* Article Meta */}
-                  <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
+                  <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
                     <div className="flex items-center gap-3 sm:gap-4">
                       <div className="flex items-center gap-1">
                         <FaClock className="text-gray-400" />
                         <span>{new Date(article.created_at).toLocaleDateString()}</span>
                       </div>
-                    </div>
-                  </div>
-
-                  {/* Engagement Stats */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3 sm:gap-4 text-sm text-gray-500">
                       <div className="flex items-center gap-1">
-                        <FaEye />
-                        <span>—</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <FaComment />
-                        <span>—</span>
+                        <FaEye className="text-gray-400" />
+                        <span>{article.read_time || '-'}</span>
                       </div>
                     </div>
-                    
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => handleLike(article.id)}
-                        className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm transition-colors ${
-                          likedPosts.has(article.id)
-                            ? 'bg-red-100 text-red-600'
-                            : 'bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-500'
-                        }`}
-                      >
-                        <FaHeart className={likedPosts.has(article.id) ? 'text-red-500' : ''} />
-                        <span>Like</span>
-                      </button>
-                      
-                      <button className="p-1 text-gray-500 hover:text-blue-500 transition-colors">
-                        <FaShare />
-                      </button>
-                      
-                      <button className="p-1 text-gray-500 hover:text-green-500 transition-colors">
-                        <FaBookmark />
-                      </button>
-                    </div>
                   </div>
+                  {/* End minimal meta */}
                 </div>
               </div>
             </div>
 
-            {/* Read More Button */}
-            <div className="px-3 sm:px-4 pb-3 sm:pb-4">
-              <button className="w-full bg-dark-green text-white py-2 px-4 rounded-lg text-sm sm:text-base font-medium hover:bg-green-700 transition-colors">
-                पूरा पढ़ें (Read Full Article)
-              </button>
-            </div>
           </article>
         ))}
       </div>
 
-      {/* Load More Button */}
-      <div className="text-center mt-6 sm:mt-8">
-        <button className="bg-white border-2 border-dark-green text-dark-green py-2 sm:py-3 px-5 sm:px-6 rounded-lg text-sm sm:text-base font-medium hover:bg-dark-green hover:text-white transition-all duration-200">
-          और समाचार लोड करें (Load More News)
-        </button>
-      </div>
     </div>
   );
 };

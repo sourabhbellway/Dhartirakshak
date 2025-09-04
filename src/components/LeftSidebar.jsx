@@ -182,6 +182,12 @@ const LeftSidebar = () => {
         {!catLoading && !catError && (
           <nav className="space-y-2 max-h-[50vh] lg:max-h-none overflow-auto lg:overflow-visible">
             <Link
+              to="/"
+              className="block px-3 py-2 text-sm text-gray-700 hover:text-dark-green hover:bg-green-50 rounded-lg transition-all duration-200"
+            >
+              Home
+            </Link>
+            <Link
               to="/epapers"
               className="block px-3 py-2 text-sm text-gray-700 hover:text-dark-green hover:bg-green-50 rounded-lg transition-all duration-200"
             >

@@ -3,7 +3,7 @@ import { BASE_URL } from '../../config.js'
 
 const adminNews = {
   list: async (token) => {
-    const res = await axios.get(`${BASE_URL}/api/admin/trending-news`, {
+    const res = await axios.get(`${BASE_URL}/api/admin/newsagriculture`, {
       headers: { Authorization: `Bearer ${token}` }
     })
     return res.data
@@ -13,15 +13,10 @@ const adminNews = {
       const form = new FormData()
       Object.entries(values).forEach(([k, v]) => {
         if (v !== undefined && v !== null) {
-          if (k === 'is_trending') {
-            const coerced = v === true || v === 1 || v === '1' ? '1' : '0'
-            form.append(k, coerced)
-          } else {
-            form.append(k, v)
-          }
+          form.append(k, v)
         }
       })
-      const res = await axios.post(`${BASE_URL}/api/admin/trending-news`, form, {
+      const res = await axios.post(`${BASE_URL}/api/admin/newsagriculture`, form, {
         headers: { Authorization: `Bearer ${token}` }
       })
       return res.data
@@ -33,19 +28,34 @@ const adminNews = {
     }
   },
   remove: async (token, id) => {
-    const res = await axios.delete(`${BASE_URL}/api/admin/trending-news/${id}`, {
+    const res = await axios.delete(`${BASE_URL}/api/admin/newsagriculture/${id}`, {
       headers: { Authorization: `Bearer ${token}` }
     })
     return res.data
   },
   activate: async (token, id) => {
-    const res = await axios.post(`${BASE_URL}/api/admin/trending-news/${id}/activate`, {}, {
+    const res = await axios.post(`${BASE_URL}/api/admin/newsagriculture/${id}/activate`, {}, {
       headers: { Authorization: `Bearer ${token}` }
     })
     return res.data
   },
   deactivate: async (token, id) => {
-    const res = await axios.post(`${BASE_URL}/api/admin/trending-news/${id}/deactivate`, {}, {
+    const res = await axios.post(`${BASE_URL}/api/admin/newsagriculture/${id}/deactivate`, {}, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    return res.data
+  },
+  update: async (token, id, values) => {
+    const form = new FormData()
+    // Only send fields the API accepts: title, description, heading, image
+    const allowed = ['title', 'description', 'heading', 'image']
+    allowed.forEach((key) => {
+      if (values[key] !== undefined && values[key] !== null) {
+        form.append(key, values[key])
+      }
+    })
+    // Backend expects POST to update/{id} for multipart updates
+    const res = await axios.put(`${BASE_URL}/api/admin/newsagriculture/${id}`, form, {
       headers: { Authorization: `Bearer ${token}` }
     })
     return res.data

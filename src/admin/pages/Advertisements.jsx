@@ -381,25 +381,10 @@ const Advertisements = () => {
                   </div>
                 )}
                 
-                {/* New Image Preview */}
+                {/* New Image (Dropzone) */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">New Image</label>
-                  {imagePreviewUrl ? (
-                    <div className="text-center">
-                      <img src={imagePreviewUrl} alt="New" className="h-50 rounded-lg mx-auto border border-gray-200" />
-                      <button 
-                        type="button"
-                        onClick={() => setUpdateValues(v => ({ ...v, image: null }))}
-                        className="mt-2 px-3 py-1 text-xs bg-red-100 text-red-700 rounded-full hover:bg-red-200"
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
-                      <p className="text-sm text-gray-500">No new image selected</p>
-                    </div>
-                  )}
+                  <FileDropzone label="Choose Image" accept="image/*" value={updateValues.image} onChange={(file) => setUpdateValues(v => ({ ...v, image: file }))} heightClass="h-32" />
                 </div>
               </div>
             </div>
@@ -458,11 +443,7 @@ const Advertisements = () => {
                 <textarea className="w-full border border-emerald-200 rounded-lg p-2 text-sm" name="description" placeholder="Description" value={updateValues.description} onChange={handleUpdateChange} rows={3} />
               </div>
               
-              {/* Image Update Section */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Select New Image (optional)</label>
-                <FileDropzone label="Choose Image" accept="image/*" value={updateValues.image} onChange={(file) => setUpdateValues(v => ({ ...v, image: file }))} heightClass="h-20" />
-              </div>
+              
               <div className="flex items-center justify-end gap-2 pt-2">
                 <button type="button" onClick={() => {
                   setOpenUpdate(null)
