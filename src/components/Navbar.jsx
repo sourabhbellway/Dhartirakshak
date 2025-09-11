@@ -21,25 +21,16 @@ const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
-  const { logout } = useUserAuth()
+  const { logout, isAuthenticated } = useUserAuth()
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const profileMenuRef = React.useRef(null)
   const [categories, setCategories] = useState([])
   const [catError, setCatError] = useState('')
 
+  // Keep local mirror of auth state, updates immediately on login/logout via context
   useEffect(() => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('user_token') : null
-    const adminToken = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null
-    setAuthToken(token)
-
-    const handleStorage = () => {
-      const updatedUserToken = localStorage.getItem('user_token')
-      const updatedAdminToken = localStorage.getItem('admin_token')
-      setAuthToken(updatedUserToken)
-    }
-    window.addEventListener('storage', handleStorage)
-    return () => window.removeEventListener('storage', handleStorage)
-  }, [])
+    setAuthToken(isAuthenticated ? (localStorage.getItem('user_token') || '1') : null)
+  }, [isAuthenticated])
 
   // Handle scroll event to make navbar fixed
   useEffect(() => {
@@ -153,7 +144,7 @@ const Navbar = () => {
                 </Link>
               )
             })}
-            {authToken ? (
+            {isAuthenticated ? (
               <div className="relative" ref={profileMenuRef}>
                 <button
                   onClick={() => setIsProfileOpen(v => !v)}
@@ -240,7 +231,7 @@ const Navbar = () => {
                   </Link>
                 )
               })}
-              {authToken ? (
+              {isAuthenticated ? (
                 <div className="px-2 pt-2">
                   <Link onClick={() => setIsMenuOpen(false)} to="/profile" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-gray-100 transition-colors duration-200">
                     Profile

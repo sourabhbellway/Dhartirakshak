@@ -1,5 +1,15 @@
 @import "tailwindcss";
 
+/* Smooth scrolling for better UX */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Prevent layout shift during scroll */
+* {
+  box-sizing: border-box;
+}
+
 .bg-olive {
   background-color: #f5faf0;
 }

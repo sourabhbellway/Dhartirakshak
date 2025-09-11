@@ -6,6 +6,7 @@ import Banner from '../components/Banner'
 import Navbar from '../components/Navbar'
 import LeftSidebar from '../components/LeftSidebar'
 import RightSidebar from '../components/RightSidebar'
+import Footer from '../components/Footer'
 
 const MainLayout = () => {
   const headlines = [
@@ -22,18 +23,20 @@ const MainLayout = () => {
   ]
 
   return (
-    <div className="bg-olive min-h-screen w-screen">
+    <div className="bg-olive min-h-screen scroll-smooth">
       <Background />
       <Headline headline={headlines} />
       <Banner />
-      <Navbar />
+      <div className="sticky top-0 z-50">
+        <Navbar />
+      </div>
 
-      <div className="">
-        <div className=" mx-auto px-3 sm:px-4 lg:px-8">
+      <div className="relative">
+        <div className="mx-auto px-3 sm:px-4 lg:px-8">
           {/* Desktop / Large Screens */}
           <div className="hidden lg:grid grid-cols-4 gap-6">
             <div className="lg:col-span-1">
-              <div className="sticky top-32">
+              <div className="sticky top-24 z-10">
                 <LeftSidebar />
               </div>
             </div>
@@ -43,7 +46,7 @@ const MainLayout = () => {
             </div>
 
             <div className="lg:col-span-1">
-              <div className="sticky top-32">
+              <div className="sticky top-24 z-10">
                 <RightSidebar />
               </div>
             </div>
@@ -63,6 +66,9 @@ const MainLayout = () => {
           </div>
         </div>
       </div>
+      
+      {/* Footer */}
+      <Footer />
     </div>
   )
 }

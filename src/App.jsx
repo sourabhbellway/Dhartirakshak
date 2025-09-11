@@ -15,8 +15,14 @@ import EPapers from "./admin/pages/EPapers.jsx";
 import TrendingNews from "./admin/pages/TrendingNews.jsx";
 import MainLayout from "./layout/MainLayout.jsx";
 import Blogs from "./pages/Blogs.jsx";
+import ResearchPublic from "./pages/Research.jsx";
+import ResearchDetail from "./pages/ResearchDetail.jsx";
+import ResearchCreate from "./pages/ResearchCreate.jsx";
 import Schemes from "./pages/Schemes.jsx";
 import EPapersPublic from "./pages/EPapers.jsx";
+import Research from "./admin/pages/Research.jsx";
+import Contact from "./pages/Contact.jsx";
+import About from "./pages/About.jsx";
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated } = useAuth();
@@ -37,25 +43,40 @@ const App = () => {
         {/* Public site wrapped in MainLayout */}
         <Route element={<MainLayout /> }>
           <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
           <Route path="/blogs" element={<Blogs />} />
           <Route path="/schemes" element={<Schemes />} />
+          <Route path="/research" element={<ResearchPublic />} />
+          <Route path="/research/:id" element={<ResearchDetail />} />
+          <Route
+            path="/research/create"
+            element={
+              <UserPrivateRoute>
+                <ResearchCreate />
+              </UserPrivateRoute>
+            }
+          />
           <Route
             path="/epapers"
             element={
-              <UserPrivateRoute>
+              // <UserPrivateRoute>
                 <EPapersPublic />
-              </UserPrivateRoute>
+              //  </UserPrivateRoute>
             }
           />
-          <Route
-            path="/profile"
-            element={
-              <UserPrivateRoute>
-                <Profile />
-              </UserPrivateRoute>
-            }
-          />
+          
         </Route>
+
+        {/* Standalone Profile outside MainLayout */}
+        <Route
+          path="/profile"
+          element={
+            <UserPrivateRoute>
+              <Profile />
+            </UserPrivateRoute>
+          }
+        />
 
         {/* Admin */}
         <Route path="/admin-login" element={<Login />} />
@@ -70,6 +91,7 @@ const App = () => {
           <Route index element={<Dashboard />} />
           <Route path="banners" element={<Banners />} />
           <Route path="news" element={<News />} />
+          <Route path="research" element={<Research />} />
           <Route path="trending-news" element={<TrendingNews />} />
           <Route path="advertisements" element={<Advertisements />} />
           <Route path="business-settings" element={<BusinessSettings />} />

@@ -1,4 +1,6 @@
 import React from 'react';
+import appstoreBadge from '../assets/appstore.png'
+import googleplayBadge from '../assets/googleplay.png'
 import { FaStar, FaTimes, FaFire } from 'react-icons/fa';
 import { useLocation } from 'react-router-dom'
 import advertisementPublicController from '../controllers/advertisementPublicController.js'
@@ -241,6 +243,19 @@ const RightSidebar = () => {
           </div>
         </div>
       )}
+      
+      {/* App Badges */}
+      <div className="mt-8 bg-olive rounded-lg p-3 border border-gray-200">
+        <h4 className="text-sm font-semibold text-gray-900 mb-2">Get the App</h4>
+        <div className="flex items-center gap-2 ">
+          <a href="#" target="_blank" rel="noopener noreferrer">
+            <img src={appstoreBadge} alt="App Store" className=" w-auto rounded" />
+          </a>
+          <a href="#" target="_blank" rel="noopener noreferrer">
+            <img src={googleplayBadge} alt="Google Play" className=" w-auto rounded" />
+          </a>
+        </div>
+      </div>
  
     </div>
   );

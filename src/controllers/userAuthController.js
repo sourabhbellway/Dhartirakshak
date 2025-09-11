@@ -60,6 +60,19 @@ const userAuth = {
       const message = err?.response?.data?.message || 'Failed to load profile'
       return { success: false, message }
     }
+  },
+
+  myResearches: async (token) => {
+    try {
+      const res = await axios.get(`${BASE_URL}/api/my-researches`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      const researches = res?.data?.data || res?.data || []
+      return { success: true, researches }
+    } catch (err) {
+      const message = err?.response?.data?.message || 'Failed to load researches'
+      return { success: false, message, researches: [] }
+    }
   }
 }
 

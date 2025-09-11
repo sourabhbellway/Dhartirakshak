@@ -14,10 +14,10 @@ const navItems = [
       { to: '/admin/trending-news', label: 'Trending News' },
     ]
   },
+  { type: 'link', to: '/admin/research', label: 'Research', icon: <FiBookOpen /> },
   { type: 'link', to: '/admin/advertisements', label: 'Advertisements', icon: <FiFileText /> },
   { type: 'link', to: '/admin/business-settings', label: 'Business Settings', icon: <FiLayers /> },
   { type: 'link', to: '/admin/blogs', label: 'Blogs', icon: <FiFileText /> },
-  { type: 'link', to: '/admin/research', label: 'Research', icon: <FiBookOpen /> },
   { type: 'link', to: '/admin/posts', label: 'Posts', icon: <FiLayers /> },
   { type: 'link', to: '/admin/epapers', label: 'E-Papers', icon: <FiFileText /> },
 ]
