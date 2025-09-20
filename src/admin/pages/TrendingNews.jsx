@@ -233,36 +233,58 @@ const TrendingNews = () => {
       )}
 
       {openDescription && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center" onClick={() => setOpenDescription(null)}>
-          <div className="bg-white rounded-2xl p-5 max-w-2xl w-[92%]" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-dark-green text-lg font-semibold mb-3">Trending News Details</h3>
-            <div className="space-y-4">
-              {openDescription.image && (
-                <div className="text-center">
-                  <img src={openDescription.image} alt={openDescription.title || 'news'} className="w-full max-w-md h-auto rounded-lg mx-auto" />
-                </div>
-              )}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
-                  <p className="text-sm text-gray-900">{openDescription.title || '-'}</p>
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                  <p className="text-sm text-gray-900 whitespace-pre-wrap">{openDescription.description || '-'}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Created</label>
-                  <p className="text-sm text-gray-900">{openDescription.created_at ? new Date(openDescription.created_at).toLocaleDateString() : '-'}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                  <span className={`px-2 py-1 rounded-full text-xs ${openDescription.is_active ? 'bg-emerald-600 text-white' : 'bg-rose-500 text-white'}`}>{openDescription.is_active ? 'Active' : 'Inactive'}</span>
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setOpenDescription(null)}>
+          <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+            {/* Header - Fixed */}
+            <div className="flex items-center justify-between p-5 border-b border-gray-200">
+              <h3 className="text-dark-green text-lg font-semibold">Trending News Details</h3>
+              <button 
+                onClick={() => setOpenDescription(null)} 
+                className="text-gray-400 hover:text-gray-600 text-xl font-bold"
+              >
+                ×
+              </button>
+            </div>
+            
+            {/* Content - Scrollable */}
+            <div className="flex-1 overflow-y-auto p-5">
+              <div className="space-y-4">
+                {openDescription.image && (
+                  <div className="text-center">
+                    <img src={openDescription.image} alt={openDescription.title || 'news'} className="w-full max-w-md h-auto rounded-lg mx-auto" />
+                  </div>
+                )}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                    <p className="text-sm text-gray-900 break-words">{openDescription.title || '-'}</p>
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <div className="text-sm text-gray-900 whitespace-pre-wrap break-words max-h-60 overflow-y-auto bg-gray-50 p-3 rounded-lg">
+                      {openDescription.description || '-'}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Created</label>
+                    <p className="text-sm text-gray-900">{openDescription.created_at ? new Date(openDescription.created_at).toLocaleDateString() : '-'}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                    <span className={`px-2 py-1 rounded-full text-xs ${openDescription.is_active ? 'bg-emerald-600 text-white' : 'bg-rose-500 text-white'}`}>{openDescription.is_active ? 'Active' : 'Inactive'}</span>
+                  </div>
                 </div>
               </div>
             </div>
-            <div className="text-right mt-4">
-              <button onClick={() => setOpenDescription(null)} className="px-4 py-2 rounded-full bg-emerald-600 text-white">Close</button>
+            
+            {/* Footer - Fixed */}
+            <div className="flex items-center justify-end gap-2 p-5 border-t border-gray-200">
+              <button 
+                onClick={() => setOpenDescription(null)} 
+                className="px-4 py-2 rounded-full bg-emerald-600 text-white hover:bg-emerald-700 transition-colors"
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>

@@ -2,13 +2,14 @@ import React from 'react';
 import appstoreBadge from '../assets/appstore.png'
 import googleplayBadge from '../assets/googleplay.png'
 import { FaStar, FaTimes, FaFire } from 'react-icons/fa';
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import advertisementPublicController from '../controllers/advertisementPublicController.js'
 import categoryPublicController from '../controllers/categoryPublicController.js'
 import newsPublicController from '../controllers/newsPublicController.js'
 
 const RightSidebar = () => {
   const location = useLocation()
+  const navigate = useNavigate()
   const [ads, setAds] = React.useState([])
   const [categories, setCategories] = React.useState([])
   const [trending, setTrending] = React.useState([])
@@ -228,13 +229,26 @@ const RightSidebar = () => {
                           <p className={`text-xs text-gray-600 break-words ${isExpanded ? '' : 'line-clamp-3'}`}>{item.description}</p>
                           <button
                             type="button"
-                            onClick={() => toggleTrendingExpand(key)}
+                            onClick={() => {
+                              if (isExpanded) {
+                                toggleTrendingExpand(key)
+                              } else {
+                                navigate(`/trending/${item.id || item._id}`)
+                              }
+                            }}
                             className="mt-1 text-[11px] text-dark-green hover:underline"
                           >
                             {isExpanded ? 'Show less' : 'Read more'}
                           </button>
                         </>
-                      ) : null
+                      ) : (
+                        <button
+                          onClick={() => navigate(`/trending/${item.id || item._id}`)}
+                          className="mt-2 text-[11px] text-dark-green hover:underline"
+                        >
+                          Read more
+                        </button>
+                      )
                     })()}
                   </div>
                 </div>

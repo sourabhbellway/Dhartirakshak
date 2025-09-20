@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { FaEye, FaClock } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 import newsPublicController from '../controllers/newsPublicController.js'
 
 const NewsFeed = () => {
   const [newsArticles, setNewsArticles] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const navigate = useNavigate()
 
   useEffect(() => {
     const load = async () => {
@@ -63,6 +65,14 @@ const NewsFeed = () => {
                   <p className="text-gray-600 text-sm mb-3 line-clamp-3 break-words">
                     {article.description}
                   </p>
+
+                  {/* Read More Button */}
+                  <button
+                    onClick={() => navigate(`/news/${article.id}`)}
+                    className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-dark-green bg-green-50 border border-green-200 rounded-md hover:bg-green-100 hover:border-green-300 transition-colors duration-200 mb-3"
+                  >
+                    Read More
+                  </button>
 
                   {/* Article Meta */}
                   <div className="flex items-center justify-between text-xs text-gray-500 mb-1">

@@ -1,0 +1,664 @@
+{
+  "info": {
+    "name": "Dhartirakshak API",
+    "description": "Postman collection for User/Researcher and Admin APIs with sample bodies.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "b9e3f7d4-7b8a-40e0-9c4f-3e6fd1c1d001"
+  },
+  "variable": [
+    { "key": "base_url", "value": "https://dhartirakshak-backend.carnate.in" },
+    { "key": "user_token", "value": "" },
+    { "key": "admin_token", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "User / Researcher",
+      "item": [
+        {
+          "name": "Auth - Signup (multipart)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name", "value": "John Doe", "type": "text" },
+                { "key": "email", "value": "john@example.com", "type": "text" },
+                { "key": "password", "value": "P@ssw0rd!", "type": "text" },
+                { "key": "phone", "value": "+911234567890", "type": "text" },
+                { "key": "image", "type": "file", "src": ["/path/to/profile.jpg"] },
+                { "key": "documents", "type": "file", "src": ["/path/to/doc1.pdf", "/path/to/doc2.pdf"] }
+              ]
+            },
+            "url": { "raw": "{{base_url}}/api/auth/signup", "host": ["{{base_url}}"], "path": ["api", "auth", "signup"] }
+          }
+        },
+        {
+          "name": "Auth - Login",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"P@ssw0rd!\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/api/auth/login", "host": ["{{base_url}}"], "path": ["api", "auth", "login"] }
+          }
+        },
+        {
+          "name": "Auth - Profile (GET)",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{user_token}}" } ],
+            "url": { "raw": "{{base_url}}/api/auth/profile", "host": ["{{base_url}}"], "path": ["api", "auth", "profile"] }
+          }
+        },
+        {
+          "name": "My Researches (GET)",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{user_token}}" } ],
+            "url": { "raw": "{{base_url}}/api/my-researches", "host": ["{{base_url}}"], "path": ["api", "my-researches"] }
+          }
+        },
+        {
+          "name": "Research - List (GET)",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Accept", "value": "application/json" } ],
+            "url": { "raw": "{{base_url}}/api/researches", "host": ["{{base_url}}"], "path": ["api", "researches"] }
+          }
+        },
+        {
+          "name": "Research - Get by ID (GET)",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Accept", "value": "application/json" } ],
+            "url": {
+              "raw": "{{base_url}}/api/researches/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "researches", ":id"],
+              "variable": [ { "key": "id", "value": "1" } ]
+            }
+          }
+        },
+        {
+          "name": "Research - Create (multipart)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{user_token}}" }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "title", "value": "Impact of Soil Moisture on Yield", "type": "text" },
+                { "key": "abstract", "value": "Summary of findings...", "type": "text" },
+                { "key": "category_id", "value": "1", "type": "text" },
+                { "key": "image", "type": "file", "src": ["/path/to/cover.jpg"] },
+                { "key": "documents", "type": "file", "src": ["/path/to/paper.pdf"] }
+              ]
+            },
+            "url": { "raw": "{{base_url}}/api/researches", "host": ["{{base_url}}"], "path": ["api", "researches"] }
+          }
+        },
+        {
+          "name": "Public - Banners (GET)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/banners", "host": ["{{base_url}}"], "path": ["api", "banners"] }
+          }
+        },
+        {
+          "name": "Public - Categories (GET)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/category", "host": ["{{base_url}}"], "path": ["api", "category"] }
+          }
+        },
+        {
+          "name": "Public - Business Settings (GET)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/business-settings", "host": ["{{base_url}}"], "path": ["api", "business-settings"] }
+          }
+        },
+        {
+          "name": "Public - Advertisements (GET)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/advertisement", "host": ["{{base_url}}"], "path": ["api", "advertisement"] }
+          }
+        },
+        {
+          "name": "Public - EPapers List (GET)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/all-epapers", "host": ["{{base_url}}"], "path": ["api", "all-epapers"] }
+          }
+        },
+        {
+          "name": "Public - EPaper Get (GET)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/all-epapers/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "all-epapers", ":id"],
+              "variable": [ { "key": "id", "value": "1" } ]
+            }
+          }
+        },
+        {
+          "name": "Public - EPaper Download (GET)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/all-epapers/:id/download",
+              "host": ["{{base_url}}"],
+              "path": ["api", "all-epapers", ":id", "download"],
+              "variable": [ { "key": "id", "value": "1" } ]
+            }
+          }
+        },
+        {
+          "name": "Public - Agriculture News (GET)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/newsagriculture", "host": ["{{base_url}}"], "path": ["api", "newsagriculture"] }
+          }
+        },
+        {
+          "name": "Public - Trending News (GET)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/trending-news-only", "host": ["{{base_url}}"], "path": ["api", "trending-news-only"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Auth - Login",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"Admin@123\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/api/admin/auth/login", "host": ["{{base_url}}"], "path": ["api", "admin", "auth", "login"] }
+          }
+        },
+        {
+          "name": "Auth - Logout",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "url": { "raw": "{{base_url}}/api/admin/auth/logout", "host": ["{{base_url}}"], "path": ["api", "admin", "auth", "logout"] }
+          }
+        },
+        {
+          "name": "Categories - List",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "url": { "raw": "{{base_url}}/api/admin/category", "host": ["{{base_url}}"], "path": ["api", "admin", "category"] }
+          }
+        },
+        {
+          "name": "Categories - Create",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" }, { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"category\": \"Irrigation\"\n}" },
+            "url": { "raw": "{{base_url}}/api/admin/category", "host": ["{{base_url}}"], "path": ["api", "admin", "category"] }
+          }
+        },
+        {
+          "name": "Business Settings - List",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "url": { "raw": "{{base_url}}/api/admin/business-settings", "host": ["{{base_url}}"], "path": ["api", "admin", "business-settings"] }
+          }
+        },
+        {
+          "name": "Business Settings - Create/Update",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" }, { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"key\": \"site_name\",\n  \"value\": \"Dhartirakshak\"\n}" },
+            "url": { "raw": "{{base_url}}/api/admin/business-settings", "host": ["{{base_url}}"], "path": ["api", "admin", "business-settings"] }
+          }
+        },
+        {
+          "name": "News (Agriculture) - List",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "url": { "raw": "{{base_url}}/api/admin/newsagriculture", "host": ["{{base_url}}"], "path": ["api", "admin", "newsagriculture"] }
+          }
+        },
+        {
+          "name": "News (Agriculture) - Create (multipart)",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "title", "value": "New irrigation policy", "type": "text" },
+                { "key": "description", "value": "Details about the policy...", "type": "text" },
+                { "key": "heading", "value": "Policy", "type": "text" },
+                { "key": "image", "type": "file", "src": ["/path/to/news.jpg"] }
+              ]
+            },
+            "url": { "raw": "{{base_url}}/api/admin/newsagriculture", "host": ["{{base_url}}"], "path": ["api", "admin", "newsagriculture"] }
+          }
+        },
+        {
+          "name": "News (Agriculture) - Update (multipart PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "title", "value": "Updated title", "type": "text" },
+                { "key": "description", "value": "Updated description", "type": "text" },
+                { "key": "heading", "value": "Updated heading", "type": "text" },
+                { "key": "image", "type": "file", "src": ["/path/to/new.jpg"] }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/newsagriculture/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "newsagriculture", ":id"],
+              "variable": [ { "key": "id", "value": "1" } ]
+            }
+          }
+        },
+        {
+          "name": "News (Agriculture) - Delete",
+          "request": {
+            "method": "DELETE",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/newsagriculture/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "newsagriculture", ":id"],
+              "variable": [ { "key": "id", "value": "1" } ]
+            }
+          }
+        },
+        {
+          "name": "News (Agriculture) - Activate",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/newsagriculture/:id/activate",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "newsagriculture", ":id", "activate"],
+              "variable": [ { "key": "id", "value": "1" } ]
+            }
+          }
+        },
+        {
+          "name": "News (Agriculture) - Deactivate",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/newsagriculture/:id/deactivate",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "newsagriculture", ":id", "deactivate"],
+              "variable": [ { "key": "id", "value": "1" } ]
+            }
+          }
+        },
+        {
+          "name": "Trending News - List",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "url": { "raw": "{{base_url}}/api/admin/trending-news", "host": ["{{base_url}}"], "path": ["api", "admin", "trending-news"] }
+          }
+        },
+        {
+          "name": "Trending News - Create (multipart)",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "title", "value": "Rainfall update", "type": "text" },
+                { "key": "description", "value": "Heavy rains expected...", "type": "text" },
+                { "key": "image", "type": "file", "src": ["/path/to/trending.jpg"] }
+              ]
+            },
+            "url": { "raw": "{{base_url}}/api/admin/trending-news", "host": ["{{base_url}}"], "path": ["api", "admin", "trending-news"] }
+          }
+        },
+        {
+          "name": "Trending News - Update (multipart via POST _method=PUT)",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "title", "value": "Updated rainfall", "type": "text" },
+                { "key": "description", "value": "Updated description", "type": "text" },
+                { "key": "image", "type": "file", "src": ["/path/to/new-trending.jpg"] },
+                { "key": "_method", "value": "PUT", "type": "text" }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/trending-news/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "trending-news", ":id"],
+              "variable": [ { "key": "id", "value": "1" } ]
+            }
+          }
+        },
+        {
+          "name": "Trending News - Delete",
+          "request": {
+            "method": "DELETE",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/trending-news/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "trending-news", ":id"],
+              "variable": [ { "key": "id", "value": "1" } ]
+            }
+          }
+        },
+        {
+          "name": "Trending News - Activate",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/trending-news/:id/activate",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "trending-news", ":id", "activate"],
+              "variable": [ { "key": "id", "value": "1" } ]
+            }
+          }
+        },
+        {
+          "name": "Trending News - Deactivate",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/trending-news/:id/deactivate",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "trending-news", ":id", "deactivate"],
+              "variable": [ { "key": "id", "value": "1" } ]
+            }
+          }
+        },
+        {
+          "name": "Trending News - Mark Trending",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/trending-news/:id/mark-trending",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "trending-news", ":id", "mark-trending"],
+              "variable": [ { "key": "id", "value": "1" } ]
+            }
+          }
+        },
+        {
+          "name": "Trending News - Unmark Trending",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/trending-news/:id/unmark-trending",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "trending-news", ":id", "unmark-trending"],
+              "variable": [ { "key": "id", "value": "1" } ]
+            }
+          }
+        },
+        {
+          "name": "Advertisements - List",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "url": { "raw": "{{base_url}}/api/admin/advertisement", "host": ["{{base_url}}"], "path": ["api", "admin", "advertisement"] }
+          }
+        },
+        {
+          "name": "Advertisements - Create (multipart)",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "title", "value": "Monsoon Offer", "type": "text" },
+                { "key": "link", "value": "https://example.com", "type": "text" },
+                { "key": "start_date", "value": "2025-06-01", "type": "text" },
+                { "key": "end_date", "value": "2025-06-30", "type": "text" },
+                { "key": "image", "type": "file", "src": ["/path/to/ad.jpg"] }
+              ]
+            },
+            "url": { "raw": "{{base_url}}/api/admin/advertisement", "host": ["{{base_url}}"], "path": ["api", "admin", "advertisement"] }
+          }
+        },
+        {
+          "name": "Advertisements - Update (multipart)",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "title", "value": "Updated Offer", "type": "text" },
+                { "key": "link", "value": "https://example.com/updated", "type": "text" },
+                { "key": "image", "type": "file", "src": ["/path/to/new-ad.jpg"] }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/advertisement/update/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "advertisement", "update", ":id"],
+              "variable": [ { "key": "id", "value": "1" } ]
+            }
+          }
+        },
+        {
+          "name": "Advertisements - Delete",
+          "request": {
+            "method": "DELETE",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/advertisement/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "advertisement", ":id"],
+              "variable": [ { "key": "id", "value": "1" } ]
+            }
+          }
+        },
+        {
+          "name": "Advertisements - Activate",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/advertisement/:id/activate",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "advertisement", ":id", "activate"],
+              "variable": [ { "key": "id", "value": "1" } ]
+            }
+          }
+        },
+        {
+          "name": "Advertisements - Deactivate",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/advertisement/:id/deactivate",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "advertisement", ":id", "deactivate"],
+              "variable": [ { "key": "id", "value": "1" } ]
+            }
+          }
+        },
+        {
+          "name": "EPapers - List",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "url": { "raw": "{{base_url}}/api/admin/all-epapers", "host": ["{{base_url}}"], "path": ["api", "admin", "all-epapers"] }
+          }
+        },
+        {
+          "name": "EPapers - Create (multipart)",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "pdf", "type": "file", "src": ["/path/to/epaper.pdf"] },
+                { "key": "publish_date", "value": "2025-06-01", "type": "text" }
+              ]
+            },
+            "url": { "raw": "{{base_url}}/api/admin/all-epapers", "host": ["{{base_url}}"], "path": ["api", "admin", "all-epapers"] }
+          }
+        },
+        {
+          "name": "EPapers - Delete",
+          "request": {
+            "method": "DELETE",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/all-epapers/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "all-epapers", ":id"],
+              "variable": [ { "key": "id", "value": "1" } ]
+            }
+          }
+        },
+        {
+          "name": "Researches - Approved List",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "url": { "raw": "{{base_url}}/api/admin/researches", "host": ["{{base_url}}"], "path": ["api", "admin", "researches"] }
+          }
+        },
+        {
+          "name": "Researches - Pending List",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "url": { "raw": "{{base_url}}/api/admin/researches/pending", "host": ["{{base_url}}"], "path": ["api", "admin", "researches", "pending"] }
+          }
+        },
+        {
+          "name": "Researches - Approve",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/researches/:id/approve",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "researches", ":id", "approve"],
+              "variable": [ { "key": "id", "value": "1" } ]
+            }
+          }
+        },
+        {
+          "name": "Researches - Reject",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/researches/:id/reject",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "researches", ":id", "reject"],
+              "variable": [ { "key": "id", "value": "1" } ]
+            }
+          }
+        },
+        {
+          "name": "Banners - List",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "url": { "raw": "{{base_url}}/api/admin/banners", "host": ["{{base_url}}"], "path": ["api", "admin", "banners"] }
+          }
+        },
+        {
+          "name": "Banners - Create (multipart)",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" }, { "key": "Content-Type", "value": "multipart/form-data" } ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "title", "value": "Welcome Banner", "type": "text" },
+                { "key": "image", "type": "file", "src": ["/path/to/banner.jpg"] },
+                { "key": "link", "value": "https://example.com", "type": "text" }
+              ]
+            },
+            "url": { "raw": "{{base_url}}/api/admin/banners", "host": ["{{base_url}}"], "path": ["api", "admin", "banners"] }
+          }
+        },
+        {
+          "name": "Banners - Delete",
+          "request": {
+            "method": "DELETE",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/banners/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "banners", ":id"],
+              "variable": [ { "key": "id", "value": "1" } ]
+            }
+          }
+        },
+        {
+          "name": "Banners - Activate",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/banners/:id/activate",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "banners", ":id", "activate"],
+              "variable": [ { "key": "id", "value": "1" } ]
+            }
+          }
+        },
+        {
+          "name": "Banners - Deactivate",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/banners/:id/deactivate",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "banners", ":id", "deactivate"],
+              "variable": [ { "key": "id", "value": "1" } ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

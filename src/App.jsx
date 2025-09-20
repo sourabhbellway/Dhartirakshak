@@ -23,6 +23,8 @@ import EPapersPublic from "./pages/EPapers.jsx";
 import Research from "./admin/pages/Research.jsx";
 import Contact from "./pages/Contact.jsx";
 import About from "./pages/About.jsx";
+import NewsDetail from "./pages/NewsDetail.jsx";
+import TrendingNewsDetail from "./pages/TrendingNewsDetail.jsx";
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated } = useAuth();
@@ -49,6 +51,8 @@ const App = () => {
           <Route path="/schemes" element={<Schemes />} />
           <Route path="/research" element={<ResearchPublic />} />
           <Route path="/research/:id" element={<ResearchDetail />} />
+          <Route path="/news/:id" element={<NewsDetail />} />
+          <Route path="/trending/:id" element={<TrendingNewsDetail />} />
           <Route
             path="/research/create"
             element={

@@ -122,31 +122,81 @@ const Banners = () => {
       />
 
       {previewSrc && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center" onClick={() => setPreviewSrc(null)}>
-          <div className="bg-white rounded-2xl p-3 max-w-3xl w-[90%]" onClick={(e) => e.stopPropagation()}>
-            <img src={previewSrc} alt="preview" className="w-full h-auto rounded-xl" />
-            <div className="text-right mt-3">
-              <button onClick={() => setPreviewSrc(null)} className="px-4 py-1.5 rounded-full bg-emerald-600 text-white">Close</button>
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setPreviewSrc(null)}>
+          <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+            {/* Header - Fixed */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+              <h3 className="text-dark-green text-lg font-semibold">Image Preview</h3>
+              <button 
+                onClick={() => setPreviewSrc(null)} 
+                className="text-gray-400 hover:text-gray-600 text-xl font-bold"
+              >
+                ×
+              </button>
+            </div>
+            
+            {/* Content - Scrollable */}
+            <div className="flex-1 overflow-y-auto p-4">
+              <div className="text-center">
+                <img src={previewSrc} alt="preview" className="w-full h-auto rounded-xl max-h-[60vh] object-contain mx-auto" />
+              </div>
+            </div>
+            
+            {/* Footer - Fixed */}
+            <div className="flex items-center justify-end gap-2 p-4 border-t border-gray-200">
+              <button 
+                onClick={() => setPreviewSrc(null)} 
+                className="px-4 py-2 rounded-full bg-emerald-600 text-white hover:bg-emerald-700 transition-colors"
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>
       )}
 
       {openCreate && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center" onClick={() => setOpenCreate(false)}>
-          <div className="bg-white rounded-2xl p-5 max-w-xl w-[92%]" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-dark-green text-lg font-semibold mb-3">Create Banner</h3>
-            <form onSubmit={handleCreateSubmit} className="space-y-3">
-              <input className="w-full border border-emerald-200 rounded-lg p-2 text-sm" name="title" placeholder="Title" value={createValues.title} onChange={handleCreateChange} required />
-              <input className="w-full border border-emerald-200 rounded-lg p-2 text-sm" name="author" placeholder="Author" value={createValues.author} onChange={handleCreateChange} />
-              <input className="w-full border border-emerald-200 rounded-lg p-2 text-sm" name="heading" placeholder="Heading" value={createValues.heading} onChange={handleCreateChange} />
-              <textarea className="w-full border border-emerald-200 rounded-lg p-2 text-sm" name="description" placeholder="Description" value={createValues.description} onChange={handleCreateChange} />
-              <input className="w-full border border-emerald-200 rounded-lg p-2 text-sm" name="image" type="file" accept="image/*" onChange={handleCreateChange} required />
-              <div className="flex items-center justify-end gap-2 pt-2">
-                <button type="button" onClick={() => setOpenCreate(false)} className="px-4 py-2 rounded-full bg-emerald-100 text-emerald-900">Cancel</button>
-                <button type="submit" className="px-4 py-2 rounded-full bg-emerald-700 text-white">Create</button>
-              </div>
-            </form>
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setOpenCreate(false)}>
+          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+            {/* Header - Fixed */}
+            <div className="flex items-center justify-between p-5 border-b border-gray-200">
+              <h3 className="text-dark-green text-lg font-semibold">Create Banner</h3>
+              <button 
+                onClick={() => setOpenCreate(false)} 
+                className="text-gray-400 hover:text-gray-600 text-xl font-bold"
+              >
+                ×
+              </button>
+            </div>
+            
+            {/* Content - Scrollable */}
+            <div className="flex-1 overflow-y-auto p-5">
+              <form onSubmit={handleCreateSubmit} className="space-y-3">
+                <input className="w-full border border-emerald-200 rounded-lg p-2 text-sm" name="title" placeholder="Title" value={createValues.title} onChange={handleCreateChange} required />
+                <input className="w-full border border-emerald-200 rounded-lg p-2 text-sm" name="author" placeholder="Author" value={createValues.author} onChange={handleCreateChange} />
+                <input className="w-full border border-emerald-200 rounded-lg p-2 text-sm" name="heading" placeholder="Heading" value={createValues.heading} onChange={handleCreateChange} />
+                <textarea className="w-full border border-emerald-200 rounded-lg p-2 text-sm" name="description" placeholder="Description" value={createValues.description} onChange={handleCreateChange} rows={3} />
+                <input className="w-full border border-emerald-200 rounded-lg p-2 text-sm" name="image" type="file" accept="image/*" onChange={handleCreateChange} required />
+              </form>
+            </div>
+            
+            {/* Footer - Fixed */}
+            <div className="flex items-center justify-end gap-2 p-5 border-t border-gray-200">
+              <button 
+                type="button" 
+                onClick={() => setOpenCreate(false)} 
+                className="px-4 py-2 rounded-full bg-emerald-100 text-emerald-900 hover:bg-emerald-200 transition-colors"
+              >
+                Cancel
+              </button>
+              <button 
+                type="submit" 
+                onClick={handleCreateSubmit}
+                className="px-4 py-2 rounded-full bg-emerald-700 text-white hover:bg-emerald-800 transition-colors"
+              >
+                Create
+              </button>
+            </div>
           </div>
         </div>
       )}
