@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { IoClose } from 'react-icons/io5'
 import { useUserAuth } from '../contexts/UserAuthContext.jsx'
 import { toast } from 'react-toastify'
@@ -44,11 +45,11 @@ const AuthModal = ({ isOpen, onClose, defaultTab = 'signin' }) => {
     }
   }
 
-  return (
-    <div className="fixed inset-0 z-[1000] flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+  return createPortal(
+    <div className="fixed inset-0 z-[2000] flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
 
-      <div className="relative z-[1001] w-full max-w-md mx-4 rounded-2xl bg-white shadow-2xl">
+      <div className="relative z-[2001] w-full max-w-md mx-4 rounded-2xl bg-white shadow-2xl">
         <div className="flex items-center justify-between px-6 py-4 border-b">
           <div className="flex items-center gap-2">
             <div className="h-8 w-8 rounded-full bg-emerald-100 text-emerald-700 grid place-items-center font-semibold">DR</div>
@@ -163,7 +164,8 @@ const AuthModal = ({ isOpen, onClose, defaultTab = 'signin' }) => {
           </form>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
 

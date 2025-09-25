@@ -5,6 +5,8 @@ import newsPublicController from '../controllers/newsPublicController.js'
 
 const NewsFeed = () => {
   const [newsArticles, setNewsArticles] = useState([])
+  const [page, setPage] = useState(1)
+  const pageSize = 10
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const navigate = useNavigate()
@@ -17,7 +19,7 @@ const NewsFeed = () => {
         const data = res?.data || res || []
         const parsed = Array.isArray(data) ? data : []
         setNewsArticles(parsed)
-      } catch (e) {
+      } catch {
         setError('Failed to load news')
       } finally {
         setLoading(false)
@@ -27,6 +29,17 @@ const NewsFeed = () => {
   }, [])
 
   // UI is read-only per requirements
+
+  const total = newsArticles.length
+  const totalPages = Math.max(1, Math.ceil(total / pageSize))
+  const startIdx = (page - 1) * pageSize
+  const paged = newsArticles.slice(startIdx, startIdx + pageSize)
+
+  const goTo = (p) => {
+    if (p < 1 || p > totalPages) return
+    setPage(p)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 
   return (
     <div className="w-full h-full bg-gray-50 p-3 sm:p-4">
@@ -46,7 +59,7 @@ const NewsFeed = () => {
 
       {/* News Articles */}
       <div className="space-y-4 sm:space-y-6">
-        {newsArticles.map((article) => (
+        {paged.map((article) => (
           <article key={article.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all duration-200">
             {/* Article Header */}
             <div className="p-3 sm:p-4">
@@ -94,6 +107,13 @@ const NewsFeed = () => {
 
           </article>
         ))}
+      </div>
+
+      {/* Pagination */}
+      <div className="mt-6 flex items-center justify-center gap-2">
+        <button onClick={() => goTo(page - 1)} disabled={page === 1} className="px-3 py-1.5 text-sm rounded-md border disabled:opacity-50">Prev</button>
+        <div className="text-sm">Page {page} of {totalPages}</div>
+        <button onClick={() => goTo(page + 1)} disabled={page === totalPages} className="px-3 py-1.5 text-sm rounded-md border disabled:opacity-50">Next</button>
       </div>
 
     </div>

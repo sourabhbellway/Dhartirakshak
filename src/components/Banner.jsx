@@ -50,7 +50,7 @@ const Banner = () => {
 
   return (
     <div
-      className="relative w-full overflow-hidden z-10"
+      className="relative w-full overflow-hidden z-10 "
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
@@ -64,7 +64,8 @@ const Banner = () => {
               <img
                 src={item.image}
                 alt={item.title || 'banner'}
-                className="w-full h-[200px] sm:h-[120px] md:h-[160px] lg:h-[200px] object-cover"
+                // className="w-full h-[200px] sm:h-[120px] md:h-[160px] lg:h-[200px] object-cover"
+                className="w-full h-[60vh] object-cover"
                 loading="lazy"
               />
             </div>

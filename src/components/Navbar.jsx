@@ -8,6 +8,7 @@ import { FaUserCircle } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import { useLocation, useNavigate } from 'react-router-dom'
 import AuthModal from './AuthModal.jsx'
+import PhoneAuthModal from './PhoneAuthModal.jsx'
 import { useUserAuth } from '../contexts/UserAuthContext.jsx'
 import { toast } from 'react-toastify'
 import categoryPublicController from '../controllers/categoryPublicController.js'
@@ -15,8 +16,9 @@ import categoryPublicController from '../controllers/categoryPublicController.js
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
-  const [authToken, setAuthToken] = useState(null)
+  const [authToken, setAuthToken] = useState(null) // eslint-disable-line no-unused-vars
   const [showAuth, setShowAuth] = useState(false)
+  const [showPhoneAuth, setShowPhoneAuth] = useState(false)
   const [defaultTab, setDefaultTab] = useState('signin')
   const [isScrolled, setIsScrolled] = useState(false)
   const location = useLocation()
@@ -25,7 +27,7 @@ const Navbar = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const profileMenuRef = React.useRef(null)
   const [categories, setCategories] = useState([])
-  const [catError, setCatError] = useState('')
+  const [catError, setCatError] = useState('') // eslint-disable-line no-unused-vars
 
   // Keep local mirror of auth state, updates immediately on login/logout via context
   useEffect(() => {
@@ -62,7 +64,7 @@ const Navbar = () => {
         const res = await categoryPublicController.list()
         const data = res?.data || res || []
         setCategories(Array.isArray(data) ? data : [])
-      } catch (e) {
+      } catch {
         setCatError('')
       }
     }
@@ -76,10 +78,7 @@ const Navbar = () => {
     setIsMenuOpen(!isMenuOpen)
   }
 
-  const handleSearch = (e) => {
-    e.preventDefault()
-    // Implement search here
-  }
+  const handleSearch = () => {}
 
   const handleLogout = () => {
     logout()
@@ -100,7 +99,7 @@ const Navbar = () => {
   }, [isProfileOpen])
 
   return (
-    <nav className={`${isScrolled ? 'fixed top-0' : 'relative'} w-full bg-white z-40 transition-all duration-300`}>
+    <nav className={`${isScrolled ? 'fixed top-0' : 'relative'} w-full bg-white z-50 transition-all duration-300`}>
       <div className=" mx-auto px-4 sm:px-6 lg:px-10">
         <div className="flex justify-between items-center h-16">
           {/* Logo Section */}
@@ -116,7 +115,7 @@ const Navbar = () => {
                   type="text"
                   placeholder="Search globally..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(event) => setSearchQuery(event.target.value)}
                   className="w-full px-4 py-2 pl-10 pr-4 text-black bg-white/0 shadow-xs rounded-lg border border-white/30 focus:border-white/50 focus:outline-none focus:ring-1 focus:ring-white/50 transition-all duration-200 placeholder:text-gray-300"
                 />
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -154,7 +153,7 @@ const Navbar = () => {
                 </button>
                 {/* Dropdown */}
                 <div
-                  className={`absolute right-0 mt-2 w-44 origin-top-right rounded-xl border border-gray-100 bg-white shadow-lg transition-all duration-200 ${isProfileOpen ? 'opacity-100 scale-100 translate-y-0 pointer-events-auto' : 'opacity-0 scale-95 -translate-y-1 pointer-events-none'}`}
+                  className={`absolute z-[60] right-0 mt-2 w-44 origin-top-right rounded-xl border border-gray-100 bg-white shadow-lg transition-all duration-200 ${isProfileOpen ? 'opacity-100 scale-100 translate-y-0 pointer-events-auto' : 'opacity-0 scale-95 -translate-y-1 pointer-events-none'}`}
                 >
                   <Link
                     to="/profile"
@@ -173,8 +172,9 @@ const Navbar = () => {
               </div>
             ) : (
               <div className="flex items-center space-x-4">
-                <button onClick={() => { setDefaultTab('signin'); setShowAuth(true) }} className="text-olive bg-dark-green px-3 py-1 rounded-md text-sm font-medium transition-colors duration-200">
-                  Sign In
+                <button onClick={() => { setDefaultTab('signin'); setShowPhoneAuth(true) }} className="flex items-center text-gray-700 hover:text-emerald-950 px-3 py-2 rounded-md transition-colors duration-200">
+                <FaUserCircle size={26} />
+                 
                 </button>
               </div>
             )}
@@ -242,10 +242,12 @@ const Navbar = () => {
                 </div>
               ) : (
                 <div className="flex items-center gap-3 px-2 pt-2">
-                  <button onClick={() => { setDefaultTab('signin'); setShowAuth(true); setIsMenuOpen(false) }} className="flex-1 text-center px-3 py-2 rounded-md text-base font-medium text-emerald-700 border border-emerald-600 hover:bg-emerald-50 transition-colors duration-200">
+                  <button onClick={() => { setDefaultTab('signin'); setShowPhoneAuth(true); setIsMenuOpen(false) }} className="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 rounded-md text-base font-medium text-emerald-700 border border-emerald-600 hover:bg-emerald-50 transition-colors duration-200">
+                    <FaUserCircle size={18} />
                     Sign In
                   </button>
-                  <button onClick={() => { setDefaultTab('signup'); setShowAuth(true); setIsMenuOpen(false) }} className="flex-1 text-center px-3 py-2 rounded-md text-base font-medium text-white bg-emerald-600 hover:bg-emerald-700 transition-colors duration-200">
+                  <button onClick={() => { setDefaultTab('signup'); setShowPhoneAuth(true); setIsMenuOpen(false) }} className="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 rounded-md text-base font-medium text-white bg-emerald-600 hover:bg-emerald-700 transition-colors duration-200">
+                    <FaUserCircle size={18} />
                     Sign Up
                   </button>
                 </div>
@@ -254,6 +256,7 @@ const Navbar = () => {
           </div>
         )}
         <AuthModal isOpen={showAuth} onClose={() => setShowAuth(false)} defaultTab={defaultTab} />
+        <PhoneAuthModal isOpen={showPhoneAuth} onClose={() => setShowPhoneAuth(false)} />
       </div>
     </nav>
   )

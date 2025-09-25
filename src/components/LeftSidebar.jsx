@@ -1,24 +1,21 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import {
-  FaNewspaper,
-  FaChartLine,
-  FaFileAlt,
-  FaBookOpen,
-  FaHome,
-  FaInfoCircle,
-  FaPhone,
-  FaEnvelope,
-} from "react-icons/fa";
-import categoryPublicController from "../controllers/categoryPublicController.js";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { FaInfoCircle, FaBolt, FaChevronRight } from "react-icons/fa";
+import newsPublicController from "../controllers/newsPublicController.js";
+import { FaFire } from "react-icons/fa";
 import businessSettingsPublicController from "../controllers/businessSettingsPublicController.js";
 import weatherPublicController from "../controllers/weatherPublicController.js";
 import geocodingPublicController from "../controllers/geocodingPublicController.js";
-
+import { MdOutlineRemoveRedEye  } from "react-icons/md";
 const LeftSidebar = () => {
-  const [categories, setCategories] = React.useState([]);
-  const [catLoading, setCatLoading] = React.useState(false);
-  const [catError, setCatError] = React.useState("");
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Trending states
+  const [trending, setTrending] = React.useState([]);
+  const [expandedTrending, setExpandedTrending] = React.useState(
+    () => new Set()
+  );
 
   // Weather states
   const [weatherApiKey, setWeatherApiKey] = React.useState("");
@@ -46,22 +43,47 @@ const LeftSidebar = () => {
     { name: "Research", path: "/research" },
     { name: "Events", path: "/events" },
     { name: "Contact", path: "/contact" },
-    { name: "About", path: "/about" },  
+    { name: "About", path: "/about" },
   ];
+  // Directory options shown on Directory route
+  const departments = [
+    "Department of Agricultural Research & Education (DARE)",
+    "Dept. of Agriculture, Cooperation & Farmers Welfare (DAC&FW)",
+    "Department of Animal Husbandry & Dairying (DAHD)",
+    "Department of Fisheries",
+  ];
+  const subDepartmentsByDept = {
+    "Department of Agricultural Research & Education (DARE)": [
+      "Headquarters",
+      "Research Wing",
+      "Admin Wing",
+    ],
+    "Dept. of Agriculture, Cooperation & Farmers Welfare (DAC&FW)": [
+      "Headquarters",
+      "Crops Division",
+      "Policy & Coordination",
+    ],
+    "Department of Animal Husbandry & Dairying (DAHD)": [
+      "Animal Health",
+      "Dairy Development",
+      "Livestock Production",
+    ],
+    "Department of Fisheries": [
+      "Head Office",
+      "Marine Division",
+      "Inland Division",
+    ],
+  };
+  const [openDept, setOpenDept] = React.useState(null);
 
   React.useEffect(() => {
     const load = async () => {
-      setCatLoading(true);
-      setCatError("");
       try {
-        const res = await categoryPublicController.list();
-        const data = res?.data || res || [];
-        const parsed = Array.isArray(data) ? data : [];
-        setCategories(parsed);
-      } catch (e) {
-        setCatError("Failed to load categories");
-      } finally {
-        setCatLoading(false);
+        const trendRes = await newsPublicController.listTrending();
+        const trendData = trendRes?.data || trendRes || [];
+        setTrending(Array.isArray(trendData) ? trendData : []);
+      } catch {
+        // ignore trending fetch errors
       }
     };
     load();
@@ -116,7 +138,9 @@ const LeftSidebar = () => {
                 "weather_city_coords",
                 JSON.stringify({ lat: latitude, lon: longitude })
               );
-            } catch {}
+            } catch {
+              // ignore localStorage errors
+            }
           } catch {
             // fallback to coords without name
             setSelectedCity("My Location");
@@ -180,7 +204,7 @@ const LeftSidebar = () => {
           );
         }
         setWeatherData(data);
-      } catch (e) {
+      } catch {
         setWeatherError("Failed to load weather");
       } finally {
         setWeatherLoading(false);
@@ -201,29 +225,211 @@ const LeftSidebar = () => {
         "weather_city_coords",
         JSON.stringify({ lat: sugg.lat, lon: sugg.lon })
       );
-    } catch {}
+    } catch {
+      // ignore localStorage errors
+    }
   };
 
-  const getCategoryName = (c) => c?.category || c?.name || c?.title || "";
-  const normalize = (s) =>
-    (s || "")
-      .toString()
-      .trim()
-      .replace(/^\/+|\/+$/g, "")
-      .toLowerCase();
+  const toggleTrendingExpand = (key) => {
+    setExpandedTrending((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
 
   return (
-    <div className="w-full h-full bg-gray-50  border-r lg:border-r border-b lg:border-b-0 border-gray-200 p-3 sm:p-4">
+      <div className="w-full h-full bg-gray-50  border-r lg:border-r border-b lg:border-b-0 border-gray-200 p-3 sm:p-4">
+        <div>
+          <Link to="/expo" className="flex gap-2 items-center bg-dark-green text-white text-xl px-4 py-1 rounded-lg tracking-widest w-fit">EXPO <MdOutlineRemoveRedEye /></Link>
+        </div>
+      {/* Bulletins (default) or Departments (on /directory) */}
+      <div className="mb-6 sm:mb-8">
+        <div className="rounded-xl p-[2px] bg-[radial-gradient(circle_at_20%_0%,_#d9fbe6,_#ffffff_60%)]">
+          <div className="rounded-[11px] bg-white">
+            {location.pathname === '/directory' ? (
+              <>
+                <div className="px-3 sm:px-4 pt-3 sm:pt-4 pb-2 sm:pb-3">
+                  <h3 className="text-lg sm:text-xl font-bold text-dark-green">Agriculture Departments</h3>
+                </div>
+                <ul className="divide-y divide-gray-100">
+                  {departments.map((name) => {
+                    const isOpen = openDept === name;
+                    return (
+                      <li key={name} className="group px-3 sm:px-4">
+                        <button
+                          onClick={() => {
+                            setOpenDept((prev) => (prev === name ? null : name));
+                            const current = new URLSearchParams(location.search);
+                            current.set('dept', name);
+                            current.delete('sub');
+                            navigate(`/directory?${current.toString()}`);
+                          }}
+                          className="w-full text-left relative py-2.5 sm:py-3 flex items-start gap-2 sm:gap-3"
+                        >
+                          <div className="mt-1.5 inline-flex h-2 w-2 rounded-full bg-green-600"></div>
+                          <p className="flex-1 text-[13px] sm:text-sm text-gray-800 leading-snug">
+                            <span className="inline-block transition-transform duration-200 group-hover:translate-x-0.5">
+                              {name}
+                            </span>
+                          </p>
+                          <FaChevronRight className={`mt-0.5 text-gray-400 group-hover:text-dark-green transition-all ${isOpen ? 'rotate-90' : ''}`} />
+                        </button>
+                        {isOpen && (
+                          <div className="mb-2 pl-6">
+                            {subDepartmentsByDept[name].map((s) => (
+                              <Link
+                                key={s}
+                                to={`/directory?dept=${encodeURIComponent(name)}&sub=${encodeURIComponent(s)}`}
+                                className="block px-2 py-1.5 text-[13px] text-gray-700 hover:text-dark-green hover:bg-green-50 rounded"
+                              >
+                                {s}
+                              </Link>
+                            ))}
+                          </div>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </>
+            ) : (
+              <>
+                <div className="px-3 sm:px-4 pt-3 sm:pt-4 pb-2 sm:pb-3 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-lg sm:text-xl font-bold text-dark-green">Bulletins</h3>
+                    <span className="inline-flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold text-emerald-700 bg-emerald-100/80 border border-emerald-200 px-2 py-0.5 rounded-full">
+                      <FaBolt className="text-emerald-600" /> Live
+                    </span>
+                  </div>
+                  <div className="hidden sm:block text-[11px] text-gray-500">Top 10 updates</div>
+                </div>
+                <ul className="divide-y divide-gray-100">
+                  {[
+                    "Monsoon likely to advance over central India this week",
+                    "Govt announces MSP hike for key Kharif crops",
+                    "Soil health cards distribution drive starts today",
+                    "New drone guidelines for crop spraying released",
+                    "Wheat arrivals ease; prices remain steady in mandis",
+                    "PMFBY claim window extended for select districts",
+                    "Horticulture exports hit new record this quarter",
+                    "Major canal maintenance scheduled next month",
+                    "Pulses acreage up 12% year-on-year",
+                    "Farmer producer org grants open for applications",
+                  ].map((text, i) => (
+                    <li key={i} className="group px-3 sm:px-4">
+                      <div className="relative py-2.5 sm:py-3 flex items-start gap-2 sm:gap-3">
+                        <div className="mt-1.5 inline-flex h-2 w-2 rounded-full bg-rose-700  animate-pulse"></div>
+                        <p className="flex-1 text-[13px] sm:text-sm text-gray-800 leading-snug">
+                          <span className="inline-block transition-transform duration-200 group-hover:translate-x-0.5">
+                            {text}
+                          </span>
+                        </p>
+                        <FaChevronRight className="mt-0.5 text-gray-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200" />
+                        <span className="absolute inset-0 pointer-events-none rounded-md bg-gradient-to-r from-green-50/0 via-green-50/0 to-green-50/0 group-hover:to-green-50/60 transition-colors duration-300"></span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+      
+      {/* Trending News - moved from RightSidebar to top here */}
+      {Array.isArray(trending) && trending.length > 0 && (
+        <div className="mb-6 sm:mb-8">
+          <div className="mb-4 sm:mb-6 text-center">
+            <h2 className="text-lg sm:text-xl font-bold text-dark-green">
+              Trending News
+            </h2>
+            <p className="text-xs sm:text-sm text-gray-600">Latest & Popular</p>
+          </div>
+          <div className="space-y-3">
+            {trending.slice(0, 6).map((item, idx) => (
+              <article
+                key={item.id || item._id || idx}
+                className="relative bg-white rounded-lg p-3 border border-gray-200 hover:shadow-sm transition-all duration-200"
+              >
+                <div className="absolute top-1 right-1 flex items-center gap-1 bg-rose-100 text-rose-700 text-[9px] px-2 py-0.5 rounded-full border border-red-200 shadow-sm animate-pulse">
+                  <FaFire className="text-rose-500" />
+                  <span className="font-semibold ">Trending Now</span>
+                </div>
+                <div className="flex items-start gap-3">
+                  {item.image ? (
+                    <img
+                      src={item.image}
+                      alt={item.title || "trending"}
+                      className="w-16 h-16 object-cover rounded-md border"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 rounded-md border bg-gray-100 flex items-center justify-center text-gray-400 text-xs">
+                      No image
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    {item.title && (
+                      <h4 className="font-semibold text-gray-900 text-sm mb-1 line-clamp-2">
+                        {item.title}
+                      </h4>
+                    )}
+                    {(() => {
+                      const key = item.id || item._id || idx;
+                      const isExpanded = expandedTrending.has(key);
+                      return item.description ? (
+                        <>
+                          <p
+                            className={`text-xs text-gray-600 break-words ${
+                              isExpanded ? "" : "line-clamp-3"
+                            }`}
+                          >
+                            {item.description}
+                          </p>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (isExpanded) {
+                                toggleTrendingExpand(key);
+                              } else {
+                                navigate(`/trending/${item.id || item._id}`);
+                              }
+                            }}
+                            className="mt-1 text-[11px] text-dark-green hover:underline"
+                          >
+                            {isExpanded ? "Show less" : "Read more"}
+                          </button>
+                        </>
+                      ) : (
+                        <button
+                          onClick={() =>
+                            navigate(`/trending/${item.id || item._id}`)
+                          }
+                          className="mt-2 text-[11px] text-dark-green hover:underline"
+                        >
+                          Read more
+                        </button>
+                      );
+                    })()}
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Logo Section */}
-      <div className="mb-4 sm:mb-6 text-center">
+      {/* <div className="mb-4 sm:mb-6 text-center">
         <h2 className="text-lg sm:text-xl font-bold text-dark-green">
           Quick Access
         </h2>
         <p className="text-xs sm:text-sm text-gray-600">Navigate & Discover</p>
-      </div>
+      </div> */}
 
       {/* Navigation (Categories) */}
-      <div className="mb-6 sm:mb-8">
+      {/* <div className="mb-6 sm:mb-8">
         <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4 flex items-center gap-2">
           <FaNewspaper className="text-dark-green" />
           Navigation
@@ -269,13 +475,13 @@ const LeftSidebar = () => {
             )}
           </nav>
         )}
-      </div>
+      </div> */}
 
       {/* Quick Links */}
       <div className="mb-6 sm:mb-8">
         <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4 flex items-center gap-2">
           <FaInfoCircle className="text-dark-green" />
-          Quick Links
+          Quick Access
         </h3>
         <div className="space-y-2">
           {quickLinks.map((link) => (
@@ -287,6 +493,7 @@ const LeftSidebar = () => {
               {link.name}
             </Link>
           ))}
+
         </div>
       </div>
 

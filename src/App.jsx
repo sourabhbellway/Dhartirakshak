@@ -25,6 +25,8 @@ import Contact from "./pages/Contact.jsx";
 import About from "./pages/About.jsx";
 import NewsDetail from "./pages/NewsDetail.jsx";
 import TrendingNewsDetail from "./pages/TrendingNewsDetail.jsx";
+import Expo from "./pages/Expo.jsx";
+import Directory from "./pages/Directory.jsx";
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated } = useAuth();
@@ -53,6 +55,8 @@ const App = () => {
           <Route path="/research/:id" element={<ResearchDetail />} />
           <Route path="/news/:id" element={<NewsDetail />} />
           <Route path="/trending/:id" element={<TrendingNewsDetail />} />
+          <Route path="/expo" element={<Expo />} />
+          <Route path="/directory" element={<Directory />} />
           <Route
             path="/research/create"
             element={
@@ -62,7 +66,7 @@ const App = () => {
             }
           />
           <Route
-            path="/epapers"
+            path="/e-papers"
             element={
               // <UserPrivateRoute>
                 <EPapersPublic />
