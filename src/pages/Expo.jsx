@@ -5,7 +5,8 @@ const DUMMY_EVENTS = [
   {
     id: "ev1",
     title: "AgriTech Expo 2025",
-    date: "2025-10-12",
+    startdate: "2025-10-12",
+    enddate: "2025-10-12",
     city: "Indore",
     image: "https://www.kisaanhelpline.com/public/uploads/events/1753246536.jpg",
     location: "Brilliant Convention Center, Indore",
@@ -16,8 +17,8 @@ const DUMMY_EVENTS = [
   {
     id: "ev2",
     title: "Organic Farming Summit",
-    date: "2025-11-02",
-    city: "Bhopal",
+    startdate: "2025-10-12",
+    enddate: "2025-10-12",    city: "Bhopal",
     image: "https://www.kisaanhelpline.com/public/uploads/events/1756981298.jpg",
     location: "Minto Hall, Bhopal",
     description:
@@ -27,8 +28,8 @@ const DUMMY_EVENTS = [
   {
     id: "ev3",
     title: "Irrigation & Water Management Fair",
-    date: "2025-10-25",
-    city: "Jaipur",
+    startdate: "2025-10-12",
+    enddate: "2025-10-12",    city: "Jaipur",
     image: "https://www.kisaanhelpline.com/public/uploads/events/1754388170.jpg",
     location: "JECC, Jaipur",
     description:
@@ -38,8 +39,8 @@ const DUMMY_EVENTS = [
   {
     id: "ev4",
     title: "Horticulture Expo",
-    date: "2025-12-05",
-    city: "Pune",
+    startdate: "2025-10-12",
+    enddate: "2025-10-12",    city: "Pune",
     image: "https://www.kisaanhelpline.com/public/uploads/events/1753247909.jpg",
     location: "Agriculture College Grounds, Pune",
     description:
@@ -49,8 +50,8 @@ const DUMMY_EVENTS = [
   {
     id: "ev5",
     title: "Seed Innovation Meet",
-    date: "2025-09-30",
-    city: "Hyderabad",
+    startdate: "2025-10-12",
+    enddate: "2025-10-12",    city: "Hyderabad",
     image: "https://www.kisaanhelpline.com/public/uploads/events/1745237909.jpg",
     location: "HITEX, Hyderabad",
     description:
@@ -60,8 +61,8 @@ const DUMMY_EVENTS = [
   {
     id: "ev6",
     title: "Dairy & Livestock Expo",
-    date: "2025-10-18",
-    city: "Anand",
+    startdate: "2025-10-12",
+    enddate: "2025-10-12",    city: "Anand",
     image: "https://www.kisaanhelpline.com/public/uploads/events/1753250336.jpg",
     location: "Amul Campus, Anand",
     description:
@@ -71,8 +72,8 @@ const DUMMY_EVENTS = [
   {
     id: "ev7",
     title: "Agri Finance & Insurance Forum",
-    date: "2025-11-15",
-    city: "Mumbai",
+    startdate: "2025-10-12",
+    enddate: "2025-10-12",    city: "Mumbai",
     image: "https://www.kisaanhelpline.com/public/uploads/events/1738993506.png",
     location: "BKC, Mumbai",
     description:
@@ -82,8 +83,8 @@ const DUMMY_EVENTS = [
   {
     id: "ev8",
     title: "Smart Mechanization Expo",
-    date: "2025-12-12",
-    city: "Nagpur",
+    startdate: "2025-10-12",
+    enddate: "2025-10-12",    city: "Nagpur",
     image: "https://www.kisaanhelpline.com/public/uploads/events/1747476118.jpg",
     location: "Reshimbagh Ground, Nagpur",
     description:
@@ -93,8 +94,8 @@ const DUMMY_EVENTS = [
   {
     id: "ev9",
     title: "Agri Startup Conclave",
-    date: "2025-10-09",
-    city: "Bengaluru",
+    startdate: "2025-10-12",
+    enddate: "2025-10-12",    city: "Bengaluru",
     image: "https://www.kisaanhelpline.com/public/uploads/events/1753269474.jpg",
     location: "NIMHANS Convention Centre, Bengaluru",
     description:
@@ -104,8 +105,8 @@ const DUMMY_EVENTS = [
   {
     id: "ev10",
     title: "Soil & Climate Resilience Meet",
-    date: "2025-11-28",
-    city: "Chandigarh",
+    startdate: "2025-10-12",
+    enddate: "2025-10-12",    city: "Chandigarh",
     image: "https://www.kisaanhelpline.com/public/uploads/events/1753270857.jpg",
     location: "Sector 17 Plaza, Chandigarh",
     description:
@@ -147,16 +148,18 @@ const Expo = () => {
               <h3 className="font-semibold text-gray-900 line-clamp-2 mb-1">{ev.title}</h3>
               <div className="space-y-2 mb-2">
                 <div>
-                  <div className="text-[11px] font-semibold text-gray-500 mb-1">Date</div>
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] sm:text-xs">
-                    {formatDate(ev.date)}
-                  </span>
+                  <span className="text-xs font-semibold text-gray-500 mb-1 text-emerald-700">Start Date : {formatDate(ev.startdate)}</span>
+                  {/* <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700  text-[11px] sm:text-xs">
+                   
+                  </span> */}
                 </div>
                 <div>
-                  <div className="text-[11px] font-semibold text-gray-500 mb-1">City</div>
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200 text-[11px] sm:text-xs">
-                    {ev.city}
-                  </span>
+                  <span className="text-xs font-semibold text-gray-500 mb-1 text-emerald-700">End Date : {formatDate(ev.enddate)}</span>
+             
+                </div>
+                <div>
+                  <span className="text-xs font-semibold text-gray-500 mb-1">City :   {ev.city}</span>
+                  
                 </div>
               </div>
               <button onClick={() => open(ev)} className="mt-2 w-full inline-flex items-center justify-center gap-2 px-3 py-2 rounded-md bg-dark-green text-white text-sm shadow-sm hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-emerald-300 transition">

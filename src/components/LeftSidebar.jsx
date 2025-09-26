@@ -39,12 +39,7 @@ const LeftSidebar = () => {
   const [weatherLoading, setWeatherLoading] = React.useState(false);
   const [weatherError, setWeatherError] = React.useState("");
   const [weatherData, setWeatherData] = React.useState(null);
-  const quickLinks = [
-    { name: "Research", path: "/research" },
-    { name: "Events", path: "/events" },
-    { name: "Contact", path: "/contact" },
-    { name: "About", path: "/about" },
-  ];
+
   // Directory options shown on Directory route
   const departments = [
     "Department of Agricultural Research & Education (DARE)",
@@ -242,7 +237,7 @@ const LeftSidebar = () => {
   return (
       <div className="w-full h-full bg-gray-50  border-r lg:border-r border-b lg:border-b-0 border-gray-200 p-3 sm:p-4">
         <div>
-          <Link to="/expo" className="flex gap-2 items-center bg-dark-green text-white text-xl px-4 py-1 rounded-lg tracking-widest w-fit">EXPO <MdOutlineRemoveRedEye /></Link>
+          <Link to="/expo" className="flex gap-2 items-center justify-center bg-indigo-600 text-white text-xl px-4 py-1 rounded-lg tracking-widest w-full ">Kissan Expo & Events <MdOutlineRemoveRedEye /></Link>
         </div>
       {/* Bulletins (default) or Departments (on /directory) */}
       <div className="mb-6 sm:mb-8">
@@ -476,26 +471,6 @@ const LeftSidebar = () => {
           </nav>
         )}
       </div> */}
-
-      {/* Quick Links */}
-      <div className="mb-6 sm:mb-8">
-        <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4 flex items-center gap-2">
-          <FaInfoCircle className="text-dark-green" />
-          Quick Access
-        </h3>
-        <div className="space-y-2">
-          {quickLinks.map((link) => (
-            <Link
-              key={link.name}
-              to={link.path}
-              className="block px-3 py-2 text-sm text-gray-600 hover:text-dark-green hover:bg-green-50 rounded-lg transition-all duration-200"
-            >
-              {link.name}
-            </Link>
-          ))}
-
-        </div>
-      </div>
 
       {/* Weather Widget */}
       <div className="bg-blue-50 rounded-lg p-3 sm:p-4 border border-blue-200">

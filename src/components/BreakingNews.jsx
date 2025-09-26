@@ -11,8 +11,6 @@ const BreakingNews = () => {
       try {
         setStatus("loading");
         const res = await newsPublicController.listTrending();
-        console.log(res);
-        
         if (!isMounted) return;
         // Normalize to array of strings or titles
         const normalized = Array.isArray(res)

@@ -15,8 +15,7 @@ const Banner = () => {
       try {
         const res = await axios.get(`${BASE_URL}/api/banners`);
         const items = Array.isArray(res?.data?.data) ? res.data.data : [];
-        
-        
+
         setBanners(items);
         setActiveIndex(0);
       } catch (err) {
@@ -50,7 +49,7 @@ const Banner = () => {
 
   return (
     <div
-      className="relative w-full overflow-hidden z-10 "
+      className="relative w-full overflow-hidden z-10 md:relative md:top-0 absolute top-16"
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
@@ -60,12 +59,12 @@ const Banner = () => {
       >
         {banners.map((item) => (
           <div key={item.id} className="min-w-full">
-            <div className="w-full max-w-7xl mx-auto">
+            <div className="w-full  mx-auto">
               <img
                 src={item.image}
-                alt={item.title || 'banner'}
+                alt={item.title || "banner"}
                 // className="w-full h-[200px] sm:h-[120px] md:h-[160px] lg:h-[200px] object-cover"
-                className="w-full h-[60vh] object-cover"
+                className="w-full  object-cover"
                 loading="lazy"
               />
             </div>
@@ -81,7 +80,9 @@ const Banner = () => {
             aria-label={`Go to slide ${idx + 1}`}
             onClick={() => goTo(idx)}
             className={`h-2.5 w-2.5 rounded-full transition-all ${
-              idx === activeIndex ? 'bg-white/90 w-6' : 'bg-white/50 hover:bg-white/70'
+              idx === activeIndex
+                ? "bg-white/90 w-6"
+                : "bg-white/50 hover:bg-white/70"
             }`}
           />
         ))}

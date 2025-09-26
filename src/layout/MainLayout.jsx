@@ -1,5 +1,5 @@
 import React from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import Background from "../components/Background";
 import Headline from "../components/Headline";
 import Banner from "../components/Banner";
@@ -11,6 +11,8 @@ import Footer from "../components/Footer";
 import ScrollToTop from "../components/ScrollToTop";
 
 const MainLayout = () => {
+  const location = useLocation();
+  const isHome = location.pathname === "/";
   const headlines = [
     {
       headline:
@@ -31,12 +33,13 @@ const MainLayout = () => {
       <div className="sticky top-0 z-50">
         <Navbar />
       </div>
-      <Banner />
-      <div className="sticky top-16 z-40">
+      <div className="relative">{isHome && <Banner />}</div>
+
+      <div className="sticky top-16 z-40 md:mt-0 mt-16">
         <Headline headline={headlines} />
       </div>
 
-      <div className="relative">
+      <div className={`relative ${isHome ? "" : "pt-16"}`}>
         <div className="mx-auto px-3 sm:px-4 lg:px-8">
           {/* Desktop / Large Screens */}
           <div className="hidden lg:grid grid-cols-4 ">
@@ -47,8 +50,6 @@ const MainLayout = () => {
             </div>
 
             <div className="lg:col-span-2 min-w-0  ">
-              <BreakingNews  />
-
               <Outlet />
             </div>
 
@@ -74,9 +75,11 @@ const MainLayout = () => {
         </div>
       </div>
 
+
       {/* Footer */}
       <Footer />
     </div>
+    
   );
 };
 

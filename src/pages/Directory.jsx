@@ -1,6 +1,6 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { FaEnvelope, FaPhone, FaSearch, FaChevronDown, FaCheck } from "react-icons/fa";
+import { FaEnvelope, FaPhone, FaSearch, FaChevronDown, FaCheck ,FaMobile } from "react-icons/fa";
 import defaultAvatar from "../assets/defaultDP.jpg";
 
 // Four top-level departments and their sub-departments
@@ -120,11 +120,11 @@ const Directory = () => {
             {contacts.map((c, i) => (
               <div key={c.email + i} className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all">
                 <div className="flex items-start gap-3">
-                  <img src={c.photo} alt={c.name} className="w-12 h-12 rounded-full object-cover border" />
+                  <img src={c.photo} alt={c.name} className="w-8 h-8 rounded-full object-cover border" />
                   <div className="min-w-0">
                     <div className="text-gray-900 font-semibold leading-tight">{c.name}</div>
                     <div className="text-xs text-gray-600">{c.designation}</div>
-                    <div className="text-[11px] text-gray-500">{dept}</div>
+                    {/* <div className="text-[11px] text-gray-500">{dept}</div> */}
                   </div>
                 </div>
 
@@ -134,11 +134,11 @@ const Directory = () => {
                     <a href={`mailto:${c.email}`} className="text-gray-800 hover:underline truncate">{c.email}</a>
                   </div>
                   <div className="flex items-center gap-2">
-                    <FaPhone className="text-gray-500" />
+                    <FaPhone   className="text-gray-500" />
                     <span className="text-gray-800">Landline: {c.landline}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <FaPhone className="text-gray-500" />
+                    <FaMobile className="text-gray-500" />
                     <a href={`tel:${c.mobile.replace(/\s/g, "")}`} className="text-gray-800 hover:underline">Mobile: {c.mobile}</a>
                   </div>
                 </div>

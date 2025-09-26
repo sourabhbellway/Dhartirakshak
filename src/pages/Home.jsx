@@ -16,7 +16,7 @@ const Home = () => {
 
   return (
     <div className="min-h-screen ">
-      {/* <Banner /> */}
+      <BreakingNews />
 
       <NewsFeed />
     </div>
