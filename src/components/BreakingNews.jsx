@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import newsPublicController from "../controllers/newsPublicController";
-
+import breakingnews from "../assets/breaking.png"
 const BreakingNews = () => {
   const [items, setItems] = useState([]);
   const [status, setStatus] = useState("idle"); // idle | loading | success | error
@@ -73,7 +73,7 @@ const BreakingNews = () => {
           <span className="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse"></span>
           BREAKING NEWS
         </span> */}
-        <span><img src="https://png.pngtree.com/png-vector/20201027/ourmid/pngtree-breaking-news-banner-lower-png-image_2378724.jpg" className="h-50" alt="" /></span>
+        <span><img src={breakingnews} className="w-30" alt="" /></span>
 
         <div className="relative flex-1 overflow-hidden">
           <BreakingSlide item={content} />
@@ -114,7 +114,7 @@ const BreakingSlide = ({ item }) => {
         <div className="flex items-center gap-3 p-2  ">
           <Media image={image} video={video} alt={title} />
           <div className="min-w-0">
-            <div className="text-xs md:text-sm font-semibold leading-snug line-clamp-5">{title}</div>
+            <div className="text-xs md:text-sm font-semibold leading-snug line-clamp-3">{title}</div>
             <div className="mt-0.5 text-[10px] md:text-xs opacity-80">Breaking • Swipe/Watch</div>
           </div>
         </div>

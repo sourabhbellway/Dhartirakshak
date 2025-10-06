@@ -7,6 +7,7 @@ import businessSettingsPublicController from "../controllers/businessSettingsPub
 import weatherPublicController from "../controllers/weatherPublicController.js";
 import geocodingPublicController from "../controllers/geocodingPublicController.js";
 import { MdOutlineRemoveRedEye  } from "react-icons/md";
+import expo from "../assets/expo.png"
 const LeftSidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -237,7 +238,9 @@ const LeftSidebar = () => {
   return (
       <div className="w-full h-full bg-gray-50  border-r lg:border-r border-b lg:border-b-0 border-gray-200 p-3 sm:p-4">
         <div>
-          <Link to="/expo" className="flex gap-2 items-center justify-center bg-indigo-600 text-white text-xl px-4 py-1 rounded-lg tracking-widest w-full ">Kissan Expo & Events <MdOutlineRemoveRedEye /></Link>
+          <Link to="/expo" className="">
+          <img src={expo} alt="" className="w-full" />
+          </Link>
         </div>
       {/* Bulletins (default) or Departments (on /directory) */}
       <div className="mb-6 sm:mb-8">
