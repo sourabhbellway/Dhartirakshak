@@ -237,7 +237,7 @@ const LeftSidebar = () => {
 
   return (
       <div className="w-full h-full bg-gray-50  border-r lg:border-r border-b lg:border-b-0 border-gray-200 p-3 sm:p-4">
-        <div>
+        <div className=" mb-2">
           <Link to="/expo" className="">
           <img src={expo} alt="" className="w-full" />
           </Link>
